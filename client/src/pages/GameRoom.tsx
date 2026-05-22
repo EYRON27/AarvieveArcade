@@ -13,6 +13,8 @@ const SnakeGame = lazy(() => import('../games/snake/Snake'));
 const TicTacToe = lazy(() => import('../games/ticTacToe/TicTacToe'));
 const MemoryGame = lazy(() => import('../games/memoryGame/MemoryGame'));
 const NeonSequence = lazy(() => import('../games/neonSequence/NeonSequence'));
+const SpaceDodger = lazy(() => import('../games/spaceDodger/SpaceDodger'));
+const WhackABug = lazy(() => import('../games/whackABug/WhackABug'));
 const ReactionGame = lazy(() => import('../games/reactionGame/ReactionGame'));
 const CatchMyHeart = lazy(() => import('../games/catchMyHeart/CatchMyHeart'));
 const RelationshipTrivia = lazy(() => import('../games/coupleGames/RelationshipTrivia'));
@@ -23,6 +25,8 @@ const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }
   ticTacToe:          { title: 'Tic Tac Toe',       desc: 'Outsmart the AI on the classic 3×3 grid.',      icon: '❌' },
   memoryGame:         { title: 'Memory Cards',      desc: 'Match all pairs as fast as possible.',          icon: '🧠' },
   neonSequence:       { title: 'Neon Sequence',     desc: 'Memorize the color sequence pattern.',          icon: '👁️' },
+  spaceDodger:        { title: 'Space Dodger',      desc: 'Dodge the falling asteroids to survive!',       icon: '🚀' },
+  whackABug:          { title: 'Whack-A-Bug',       desc: 'Smash as many bugs as you can in 30s.',         icon: '🐛' },
   reactionGame:       { title: 'Reaction Clicker',  desc: 'Click the target instantly — test your reflex.',icon: '⚡' },
   catchMyHeart:       { title: 'Catch My Heart',    desc: 'Catch falling hearts with your basket.',        icon: '🧺' },
   relationshipTrivia: { title: 'Arcade Trivia',     desc: 'Test your gaming knowledge — 5 questions.',     icon: '🎯' }
@@ -89,6 +93,10 @@ const GameRoom: React.FC = () => {
         return <MemoryGame onComplete={handleGameComplete} />;
       case 'neonSequence':
         return <NeonSequence onComplete={handleGameComplete} />;
+      case 'spaceDodger':
+        return <SpaceDodger onComplete={handleGameComplete} />;
+      case 'whackABug':
+        return <WhackABug onComplete={handleGameComplete} />;
       case 'reactionGame':
         return <ReactionGame onComplete={handleGameComplete} />;
       case 'catchMyHeart':

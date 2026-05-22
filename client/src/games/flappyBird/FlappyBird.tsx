@@ -16,13 +16,13 @@ const FlappyBird: React.FC<FlappyBirdProps> = ({ onComplete }) => {
   const physicsRef = useRef({
     birdY: 200,
     birdVelocity: 0,
-    gravity: 0.15,
-    jumpPower: -4.5,
+    gravity: 0.08,
+    jumpPower: -3.5,
     pipes: [] as Array<{ x: number; topHeight: number; bottomHeight: number; passed: boolean }>,
-    pipeSpeed: 1.5,
-    pipeSpacing: 250,
+    pipeSpeed: 1.2,
+    pipeSpacing: 300,
     pipeWidth: 50,
-    gapHeight: 160,
+    gapHeight: 200,
     groundY: 420,
     score: 0,
     lastTime: 0
