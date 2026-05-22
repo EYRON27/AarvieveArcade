@@ -58,7 +58,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ message }) => {
 
       {/* Footer */}
       <div className="absolute bottom-5 pixel-text text-slate-700 text-[10px]">
-        AARON × GENEVIEVE — CO-OP EDITION
+        AARVIEVE STUDIOS — ARCADE PLATFORM v1.0
       </div>
     </div>
   );

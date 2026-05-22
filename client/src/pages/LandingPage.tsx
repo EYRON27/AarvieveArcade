@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { useEffect } from 'react';
 import { Gamepad2, Zap, Trophy, Heart } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
@@ -17,7 +16,7 @@ const LandingPage: React.FC = () => {
     { icon: Gamepad2, label: '7 Playable Games',  color: 'text-arcade-red'   },
     { icon: Trophy,   label: 'Live Leaderboards', color: 'text-arcade-green' },
     { icon: Zap,      label: 'Reflex Challenges',  color: 'text-arcade-blue'  },
-    { icon: Heart,    label: 'Couples Mode',       color: 'text-arcade-red'   },
+    { icon: Heart,    label: 'Unlockable Gallery',  color: 'text-arcade-red'   },
   ];
 
   return (
@@ -45,7 +44,7 @@ const LandingPage: React.FC = () => {
           className="flex items-center gap-2 mb-6 border border-arcade-red/30 bg-arcade-red/8 rounded-full px-4 py-1.5"
         >
           <span className="w-1.5 h-1.5 bg-arcade-red rounded-full animate-pulse" />
-          <span className="pixel-text text-arcade-red text-[10px] tracking-widest">PLAYER 1 & PLAYER 2 — CO-OP EDITION</span>
+          <span className="pixel-text text-arcade-red text-[10px] tracking-widest">AARVIEVE STUDIOS — INDIE ARCADE PLATFORM</span>
         </motion.div>
 
         {/* Title */}
@@ -65,7 +64,7 @@ const LandingPage: React.FC = () => {
           transition={{ delay: 0.25 }}
           className="text-slate-400 text-base md:text-lg max-w-md mb-10 leading-relaxed"
         >
-          A personalized retro gaming platform built for two. Play, compete, and make memories together.
+          A free retro gaming platform with 7 arcade games, live leaderboards, and unlockable content. Built by Aarvieve Studios.
         </motion.p>
 
         {/* Feature tags */}
@@ -114,7 +113,7 @@ const LandingPage: React.FC = () => {
           transition={{ delay: 0.6 }}
           className="mt-12 pixel-text text-slate-700 text-[10px] tracking-widest"
         >
-          MADE BY AARON FOR GENEVIEVE — V1.0
+          AARVIEVE STUDIOS — ARCADE PLATFORM v1.0
         </motion.p>
       </div>
     </div>

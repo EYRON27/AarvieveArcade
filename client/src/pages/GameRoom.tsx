@@ -17,13 +17,13 @@ const CatchMyHeart = lazy(() => import('../games/catchMyHeart/CatchMyHeart'));
 const RelationshipTrivia = lazy(() => import('../games/coupleGames/RelationshipTrivia'));
 
 const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }> = {
-  flappyBird: { title: 'Flappy Bird', desc: 'Flap through pixel obstacles safely.', icon: '🐦' },
-  snake: { title: 'Snake Game', desc: 'Neon retro snake challenge.', icon: '🐍' },
-  ticTacToe: { title: 'Tic Tac Toe', desc: 'Play vs AI using hearts & stars.', icon: '❌' },
-  memoryGame: { title: 'Memory Cards', desc: 'Match cute couple icons quickly.', icon: '🧠' },
-  reactionGame: { title: 'Reaction Clicker', desc: 'Speed clicking challenge.', icon: '⚡' },
-  catchMyHeart: { title: 'Catch My Heart', desc: 'Catch falling hearts with a basket.', icon: '🧺' },
-  relationshipTrivia: { title: 'Couple Trivia', desc: 'Test how well we know each other!', icon: '💌' }
+  flappyBird:         { title: 'Flappy Bird',      desc: 'Navigate through obstacles without crashing.',  icon: '🐦' },
+  snake:              { title: 'Snake',             desc: 'Classic neon snake — grow longer, don\'t crash.', icon: '🐍' },
+  ticTacToe:          { title: 'Tic Tac Toe',       desc: 'Outsmart the AI on the classic 3×3 grid.',      icon: '❌' },
+  memoryGame:         { title: 'Memory Cards',      desc: 'Match all pairs as fast as possible.',          icon: '🧠' },
+  reactionGame:       { title: 'Reaction Clicker',  desc: 'Click the target instantly — test your reflex.',icon: '⚡' },
+  catchMyHeart:       { title: 'Catch My Heart',    desc: 'Catch falling hearts with your basket.',        icon: '🧺' },
+  relationshipTrivia: { title: 'Arcade Trivia',     desc: 'Test your gaming knowledge — 5 questions.',     icon: '🎯' }
 };
 
 const GameRoom: React.FC = () => {

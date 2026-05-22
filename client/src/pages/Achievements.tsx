@@ -17,9 +17,9 @@ const Achievements: React.FC = () => {
   const percentage    = total > 0 ? Math.round((unlockedCount / total) * 100) : 0;
 
   const CATEGORY_COLORS: Record<string, string> = {
-    general:  'text-arcade-blue  border-arcade-blue/30',
-    gaming:   'text-arcade-green border-arcade-green/30',
-    romantic: 'text-arcade-red   border-arcade-red/30',
+    general: 'text-arcade-blue  border-arcade-blue/30',
+    gaming:  'text-arcade-green border-arcade-green/30',
+    special: 'text-arcade-red   border-arcade-red/30',
   };
 
   return (

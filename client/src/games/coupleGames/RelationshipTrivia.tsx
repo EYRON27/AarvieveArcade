@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Play, RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
 
-interface RelationshipTriviaProps {
+interface ArcadeTriviaProps {
   onComplete: (score: number) => void;
 }
 
@@ -16,146 +16,136 @@ interface Question {
 const TRIVIA_QUESTIONS: Question[] = [
   {
     id: 1,
-    question: "Where did Player 1 & Player 2 go on their very first official date?",
-    options: ["Cozy local coffee shop", "Fine dining rooftop dinner", "Walking on beach sunset", "Retro gaming arcade hub"],
-    answerIdx: 0,
-    hint: "Think warm cups, sweet laughs, and hours of conversations."
+    question: 'What year was the iconic game "Pac-Man" first released in arcades?',
+    options: ['1978', '1980', '1982', '1985'],
+    answerIdx: 1,
+    hint: 'It was the beginning of a new decade.'
   },
   {
     id: 2,
-    question: "Who is traditionally most likely to say 'I love you' first in our co-op story?",
-    options: ["Player 1 (Aaron)", "Player 2 (Genevieve)", "Both at the exact same millisecond", "Cupid bot intervened"],
-    answerIdx: 0,
-    hint: "Aaron was completely smitten from day one!"
+    question: 'In the classic game Snake, what happens when the snake eats food?',
+    options: ['It speeds up only', 'It grows longer', 'The level restarts', 'It earns points only'],
+    answerIdx: 1,
+    hint: 'The challenge is managing your increasing size.'
   },
   {
     id: 3,
-    question: "What is our absolute favorite cozy couple activity to do on rainy evenings?",
-    options: ["Cooking gourmet dishes", "Snuggling under blankets & watching anime", "Competing in retro games", "Late-night highway drive"],
-    answerIdx: 1,
-    hint: "Warm blankets, popcorn, and popcorn anime."
+    question: 'Which console introduced the iconic D-pad (directional pad) to gaming?',
+    options: ['Atari 2600', 'Sega Genesis', 'Nintendo Game & Watch', 'PlayStation'],
+    answerIdx: 2,
+    hint: 'It was a handheld device by a famous Japanese company.'
   },
   {
     id: 4,
-    question: "Which of the following is Genevieve's absolute dream vacation destination together?",
-    options: ["Neon lights of Tokyo, Japan", "Romantic cafes of Paris, France", "Sunsets of Bali, Indonesia", "Historical streets of Rome, Italy"],
-    answerIdx: 0,
-    hint: "Think cherry blossoms, arcade culture, and starry walks."
+    question: 'In Tic-Tac-Toe, how many possible winning lines are there on a 3×3 grid?',
+    options: ['6', '8', '9', '12'],
+    answerIdx: 1,
+    hint: 'Count rows, columns, and diagonals.'
   },
   {
     id: 5,
-    question: "What is the secret ingredient that makes our relationship high score continue to grow?",
-    options: ["Trust and infinite laughter", "Playing games all day", "Competitive arcade fights", "Giving giant teddy bears"],
-    answerIdx: 0,
-    hint: "It starts with T and ends with Laughter!"
+    question: 'What is the term for the fastest possible reaction time a trained human can achieve?',
+    options: ['~100 ms', '~200 ms', '~300 ms', '~400 ms'],
+    answerIdx: 1,
+    hint: 'Elite athletes can get close to this threshold.'
   }
 ];
 
-const RelationshipTrivia: React.FC<RelationshipTriviaProps> = ({ onComplete }) => {
-  const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
+const ArcadeTrivia: React.FC<ArcadeTriviaProps> = ({ onComplete }) => {
+  const [gameState, setGameState]   = useState<'idle' | 'playing' | 'gameover'>('idle');
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
-  const [isLocked, setIsLocked] = useState(false);
+  const [score, setScore]           = useState(0);
+  const [selectedOpt, setSelected]  = useState<number | null>(null);
+  const [isLocked, setIsLocked]     = useState(false);
 
   const startQuiz = () => {
-    setCurrentIdx(0);
-    setScore(0);
-    setSelectedOpt(null);
-    setIsLocked(false);
+    setCurrentIdx(0); setScore(0); setSelected(null); setIsLocked(false);
     setGameState('playing');
   };
 
-  const handleOptionClick = (idx: number) => {
+  const handleOption = (idx: number) => {
     if (isLocked) return;
-    
-    setSelectedOpt(idx);
-    setIsLocked(true);
-
-    const question = TRIVIA_QUESTIONS[currentIdx];
-    let newScore = score;
-    if (idx === question.answerIdx) {
-      newScore += 20; // 20 points per correct answer (total 100)
-      setScore(newScore);
-    }
-
+    setSelected(idx); setIsLocked(true);
+    const q = TRIVIA_QUESTIONS[currentIdx];
+    let next = score;
+    if (idx === q.answerIdx) { next += 20; setScore(next); }
     setTimeout(() => {
       if (currentIdx + 1 < TRIVIA_QUESTIONS.length) {
-        setCurrentIdx(prev => prev + 1);
-        setSelectedOpt(null);
-        setIsLocked(false);
+        setCurrentIdx(p => p + 1); setSelected(null); setIsLocked(false);
       } else {
-        setGameState('gameover');
-        onComplete(newScore);
+        setGameState('gameover'); onComplete(next);
       }
-    }, 1500);
+    }, 1400);
   };
 
   const q = TRIVIA_QUESTIONS[currentIdx];
 
   return (
-    <div className="w-full max-w-md flex flex-col items-center select-none py-4 px-3 text-left">
-      
+    <div className="w-full max-w-md flex flex-col items-center select-none py-4 px-3">
+
+      {/* ── IDLE ── */}
       {gameState === 'idle' && (
-        <div className="flex flex-col items-center justify-center text-center py-10 w-full">
-          <span className="text-7xl mb-4 animate-float">💌</span>
-          <h3 className="font-pixel text-[11px] text-arcade-red neon-text-red tracking-widest uppercase mb-4">
-            RELATIONSHIP TRIVIA
+        <div className="flex flex-col items-center text-center py-10 w-full gap-4">
+          <span className="text-7xl">🎯</span>
+          <h3 className="pixel-text text-arcade-blue neon-text-blue tracking-widest uppercase">
+            ARCADE TRIVIA
           </h3>
-          <p className="text-slate-400 font-semibold text-sm max-w-xs mb-6 leading-relaxed">
-            Test your knowledge about our sweet co-op story! Earn a perfect 100 points to unlock specialized badges.
+          <p className="text-slate-400 text-sm max-w-xs leading-relaxed">
+            Test your gaming knowledge! 5 questions — 20 pts each. Aim for a perfect 100.
           </p>
           <button
             onClick={startQuiz}
-            className="flex items-center gap-2 bg-gradient-to-r from-arcade-red to-arcade-red text-white font-bold rounded-2xl px-6 py-4 shadow-lg text-sm select-none cursor-pointer"
+            className="flex items-center gap-2 bg-arcade-blue hover:bg-arcade-blue-hover text-white font-bold rounded-xl px-6 py-3.5 text-sm transition-all cursor-pointer"
           >
-            <Play className="w-4 h-4 fill-white" />
-            <span>START TRIVIA</span>
+            <Play className="w-4 h-4 fill-white" /> START QUIZ
           </button>
         </div>
       )}
 
+      {/* ── PLAYING ── */}
       {gameState === 'playing' && q && (
-        <div className="flex flex-col gap-5 w-full">
-          {/* Progress dashboard bar */}
-          <div className="flex justify-between items-center bg-slate-900/60 border border-slate-800 rounded-2xl py-2.5 px-4.5 text-xs font-bold text-slate-400">
-            <span>QUESTION {currentIdx + 1} OF {TRIVIA_QUESTIONS.length}</span>
-            <span className="text-arcade-red font-extrabold">Points: {score}</span>
+        <div className="flex flex-col gap-4 w-full">
+          {/* Progress bar */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-arcade-blue rounded-full transition-all duration-500"
+                style={{ width: `${((currentIdx) / TRIVIA_QUESTIONS.length) * 100}%` }}
+              />
+            </div>
+            <span className="pixel-text text-slate-500 text-[10px] shrink-0">
+              {currentIdx + 1}/{TRIVIA_QUESTIONS.length}
+            </span>
+            <span className="pixel-text text-arcade-green font-bold text-[10px] shrink-0">{score} pts</span>
           </div>
 
-          {/* Question card */}
-          <div className="bg-slate-950/80 border-2 border-slate-800 rounded-3xl p-5 shadow-inner">
-            <h3 className="text-lg font-bold text-white leading-relaxed">{q.question}</h3>
-            <p className="text-xs text-slate-500 font-bold uppercase mt-2.5 tracking-wider italic">HINT: {q.hint}</p>
+          {/* Question */}
+          <div className="bg-arcade-darker border border-white/8 rounded-xl p-5">
+            <h3 className="text-base font-bold text-white leading-relaxed">{q.question}</h3>
+            <p className="text-[10px] text-slate-600 mt-2 uppercase tracking-wider">Hint: {q.hint}</p>
           </div>
 
-          {/* Options Grid */}
-          <div className="flex flex-col gap-3">
+          {/* Options */}
+          <div className="flex flex-col gap-2.5">
             {q.options.map((opt, i) => {
               const isSelected = selectedOpt === i;
-              const isCorrect = q.answerIdx === i;
-              
-              let optStyle = "bg-slate-900 border-slate-800 hover:border-arcade-blue/50 text-slate-200";
+              const isCorrect  = q.answerIdx === i;
+              let cls = 'bg-arcade-dark border-white/8 hover:border-white/20 text-slate-200';
               if (selectedOpt !== null) {
-                if (isCorrect) {
-                  optStyle = "bg-green-500/10 border-green-500 text-green-400 neon-border-green";
-                } else if (isSelected) {
-                  optStyle = "bg-red-500/10 border-red-500 text-red-400";
-                } else {
-                  optStyle = "bg-slate-900 border-slate-950 text-slate-600 opacity-60";
-                }
+                if (isCorrect)          cls = 'bg-arcade-green/10 border-arcade-green text-arcade-green';
+                else if (isSelected)    cls = 'bg-arcade-red/10   border-arcade-red   text-arcade-red opacity-80';
+                else                    cls = 'bg-arcade-darker   border-white/4      text-slate-600  opacity-50';
               }
-
               return (
                 <button
                   key={i}
-                  onClick={() => handleOptionClick(i)}
+                  onClick={() => handleOption(i)}
                   disabled={isLocked}
-                  className={`w-full flex items-center justify-between border-2 rounded-2xl py-3.5 px-5 font-semibold text-sm transition-all text-left ${optStyle} ${!isLocked && 'hover:bg-slate-850 cursor-pointer'}`}
+                  className={`w-full flex items-center justify-between border-2 rounded-xl py-3 px-4 font-semibold text-sm transition-all text-left ${cls} ${!isLocked && 'cursor-pointer'}`}
                 >
                   <span>{opt}</span>
-                  {selectedOpt !== null && isCorrect && <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />}
-                  {selectedOpt !== null && isSelected && !isCorrect && <XCircle className="w-5 h-5 text-red-500 shrink-0" />}
+                  {selectedOpt !== null && isCorrect  && <CheckCircle2 className="w-4 h-4 shrink-0" />}
+                  {selectedOpt !== null && isSelected && !isCorrect && <XCircle className="w-4 h-4 shrink-0" />}
                 </button>
               );
             })}
@@ -163,27 +153,27 @@ const RelationshipTrivia: React.FC<RelationshipTriviaProps> = ({ onComplete }) =
         </div>
       )}
 
+      {/* ── GAME OVER ── */}
       {gameState === 'gameover' && (
-        <div className="flex flex-col items-center justify-center text-center py-6 w-full">
-          <span className="text-6xl mb-3">👑</span>
-          <h3 className="font-pixel text-[11px] text-arcade-red neon-text-red uppercase tracking-widest mb-2">
+        <div className="flex flex-col items-center text-center py-8 w-full gap-4">
+          <span className="text-6xl">{score === 100 ? '🏆' : score >= 60 ? '🥈' : '💡'}</span>
+          <h3 className="pixel-text text-arcade-blue neon-text-blue uppercase tracking-widest">
             QUIZ COMPLETE
           </h3>
-          <p className="text-slate-300 font-bold text-sm uppercase tracking-widest mt-1">TOTAL KNOWLEDGE POINTS</p>
-          <h4 className="text-6xl font-black text-white font-mono tracking-widest my-4 neon-text-red">{score} / 100</h4>
-
-          <p className="text-xs text-slate-400 font-semibold max-w-xs mb-6 leading-relaxed">
-            {score === 100 ? "💖 ABSOLUTELY PERFECT! You know our relationship co-op story perfectly." :
-             score >= 60 ? "😊 VERY GOOD! We have built some beautiful memories together." :
-             "👍 NOT BAD! Insert another love coin to review our memories again."}
+          <div className="bg-arcade-darker border border-white/8 rounded-xl py-6 px-10 my-2">
+            <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">Final Score</p>
+            <p className="text-5xl font-black font-pixel text-white">{score}<span className="text-slate-600 text-2xl">/100</span></p>
+          </div>
+          <p className="text-sm text-slate-400 max-w-xs leading-relaxed">
+            {score === 100 ? '🔥 Perfect score! You are an arcade legend.' :
+             score >= 60  ? '👍 Solid performance. Keep playing to master the rest!' :
+             '📚 Keep practicing — the leaderboard awaits!'}
           </p>
-          
           <button
             onClick={startQuiz}
-            className="flex items-center gap-1.5 bg-slate-900 hover:bg-white hover:text-black text-white border-2 border-slate-800 rounded-2xl px-6 py-3.5 font-bold text-xs tracking-wider uppercase transition-all select-none cursor-pointer"
+            className="flex items-center gap-1.5 border border-white/10 hover:border-arcade-blue/50 text-slate-400 hover:text-white font-bold rounded-xl px-6 py-3 text-xs tracking-widest uppercase transition-all cursor-pointer"
           >
-            <RotateCcw className="w-4 h-4" />
-            <span>PLAY AGAIN</span>
+            <RotateCcw className="w-4 h-4" /> PLAY AGAIN
           </button>
         </div>
       )}
@@ -192,5 +182,4 @@ const RelationshipTrivia: React.FC<RelationshipTriviaProps> = ({ onComplete }) =
   );
 };
 
-export default RelationshipTrivia;
-
+export default ArcadeTrivia;

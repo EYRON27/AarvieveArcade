@@ -20,8 +20,8 @@ const GAMES_LIST: GameItem[] = [
   { id: 'ticTacToe',          title: 'Tic Tac Toe',         icon: '❌', category: 'cozy',  difficulty: 'Easy',   approxTime: '1 min',    tag: 'VS AI',   accentColor: 'border-arcade-blue/30  hover:border-arcade-blue  text-arcade-blue'  },
   { id: 'memoryGame',         title: 'Memory Cards',        icon: '🧠', category: 'cozy',  difficulty: 'Medium', approxTime: '2 min',    tag: 'PUZZLE',  accentColor: 'border-arcade-red/30  hover:border-arcade-red  text-arcade-red'   },
   { id: 'reactionGame',       title: 'Reaction Clicker',    icon: '⚡', category: 'retro', difficulty: 'Hard',   approxTime: '30 sec',   tag: 'REFLEX',  accentColor: 'border-arcade-green/30 hover:border-arcade-green text-arcade-green' },
-  { id: 'catchMyHeart',       title: 'Catch My Heart',      icon: '🧺', category: 'cozy',  difficulty: 'Easy',   approxTime: '2 min',    tag: 'COZY',    accentColor: 'border-arcade-blue/30  hover:border-arcade-blue  text-arcade-blue'  },
-  { id: 'relationshipTrivia', title: 'Relationship Trivia', icon: '💌', category: 'cozy',  difficulty: 'Medium', approxTime: '2 min',    tag: 'COUPLE',  accentColor: 'border-arcade-red/30  hover:border-arcade-red  text-arcade-red'   },
+  { id: 'catchMyHeart',       title: 'Catch My Heart',      icon: '🧺', category: 'retro', difficulty: 'Easy',   approxTime: '2 min',    tag: 'FUN',     accentColor: 'border-arcade-blue/30  hover:border-arcade-blue  text-arcade-blue'  },
+  { id: 'relationshipTrivia', title: 'Arcade Trivia',       icon: '🎯', category: 'cozy',  difficulty: 'Medium', approxTime: '2 min',    tag: 'TRIVIA',  accentColor: 'border-arcade-red/30  hover:border-arcade-red  text-arcade-red'   },
 ];
 
 const DIFF_COLORS: Record<string, string> = {

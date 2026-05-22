@@ -53,7 +53,7 @@ const Navbar: React.FC = () => {
     { path: '/games',        label: 'Games',       icon: Zap       },
     { path: '/leaderboard',  label: 'Scores',      icon: Trophy    },
     { path: '/achievements', label: 'Badges',      icon: Award     },
-    { path: '/memories',     label: 'Memories',    icon: Heart     },
+    { path: '/memories',     label: 'Gallery',    icon: Heart     },
   ];
 
   return (

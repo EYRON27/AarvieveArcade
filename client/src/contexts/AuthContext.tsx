@@ -79,9 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               email: firebaseUser.email || '',
               displayName: firebaseUser.displayName || 'Arcade Player',
               avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${firebaseUser.displayName || 'Player'}&backgroundColor=b6e3f4`,
-              girlfriendName: 'My Valentine',
-              anniversaryDate: '2024-02-14',
-              streak: 1,
+                            streak: 1,
               totalPoints: 10,
               createdAt: new Date().toISOString()
             };
@@ -139,9 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: email,
         displayName: name,
         avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${name}&backgroundColor=b6e3f4`,
-        girlfriendName: 'My Valentine',
-        anniversaryDate: '2024-02-14',
-        streak: 1,
+                streak: 1,
         totalPoints: 10,
         createdAt: new Date().toISOString()
       };
@@ -213,9 +209,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: userCredential.user.email || '',
         displayName: userCredential.user.displayName || 'Arcade Player',
         avatarUrl: userCredential.user.photoURL || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${userCredential.user.displayName || 'Player'}&backgroundColor=b6e3f4`,
-        girlfriendName: 'My Valentine',
-        anniversaryDate: '2024-02-14',
-        streak: 1,
+                streak: 1,
         totalPoints: 10,
         createdAt: new Date().toISOString()
       };
@@ -240,3 +234,4 @@ export const useAuth = () => {
   }
   return context;
 };
+
