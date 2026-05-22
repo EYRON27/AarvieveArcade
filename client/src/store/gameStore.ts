@@ -23,7 +23,7 @@ interface GameStoreState {
   unlockAchievement:(userId: string, achievementId: string) => Promise<void>;
 }
 
-const ALL_GAME_IDS = ['flappyBird', 'snake', 'ticTacToe', 'memoryGame', 'reactionGame', 'catchMyHeart', 'relationshipTrivia'];
+const ALL_GAME_IDS = ['flappyBird', 'snake', 'ticTacToe', 'memoryGame', 'neonSequence', 'reactionGame', 'catchMyHeart', 'relationshipTrivia'];
 
 export const useGameStore = create<GameStoreState>((set, get) => ({
   achievements: [],

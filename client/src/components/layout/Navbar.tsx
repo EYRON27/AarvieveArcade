@@ -57,8 +57,9 @@ const Navbar: React.FC = () => {
   ];
 
   return (
-    <nav className="sticky top-0 z-40 w-full bg-arcade-darker/95 backdrop-blur-md border-b border-white/5">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-14">
+    <>
+      <nav className="sticky top-0 z-40 w-full bg-arcade-darker/95 backdrop-blur-md border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-14">
 
         {/* Logo */}
         <Link to="/dashboard" className="flex items-center gap-2.5 group">
@@ -161,46 +162,75 @@ const Navbar: React.FC = () => {
           </button>
         </div>
       </div>
+    </nav>
 
       {/* Mobile Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden border-t border-white/5 bg-arcade-darker/98 px-4 py-3 flex flex-col gap-1"
-          >
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-                    isActive ? 'bg-white/8 text-white border border-white/10' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
-                  }`}
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            />
+            
+            {/* Slide-in Menu */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-full w-64 bg-arcade-darker border-l border-white/10 z-50 flex flex-col p-5 shadow-2xl lg:hidden"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <span className="font-display font-bold tracking-wider text-white">Menu</span>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-white"
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-arcade-red' : 'text-slate-500'}`} />
-                  {item.label}
-                </Link>
-              );
-            })}
-            <div className="h-px bg-white/5 my-1" />
-            <div className="flex items-center justify-between px-3 py-2">
-              <div className="flex items-center gap-2">
-                <img src={user.avatarUrl} alt={user.displayName} className="w-7 h-7 rounded-lg border border-white/10" />
-                <span className="text-sm font-bold text-slate-200">{user.displayName}</span>
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button onClick={logout} className="text-red-400 text-xs font-bold flex items-center gap-1">
-                <LogOut className="w-4 h-4" /> Logout
-              </button>
-            </div>
-          </motion.div>
+
+              <div className="flex flex-col gap-2 flex-1">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
+                        isActive ? 'bg-white/10 text-white border border-white/10' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+                      }`}
+                    >
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-arcade-red' : 'text-slate-500'}`} />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="mt-auto pt-4 border-t border-white/10 flex flex-col gap-4">
+                <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
+                  <img src={user.avatarUrl} alt={user.displayName} className="w-9 h-9 rounded-xl border border-white/10" />
+                  <div>
+                    <span className="text-sm font-bold text-slate-200 block">{user.displayName}</span>
+                    <span className="text-[10px] text-slate-500 uppercase tracking-widest">{user.totalPoints} pts</span>
+                  </div>
+                </Link>
+                <button onClick={logout} className="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-bold rounded-xl py-3 text-xs tracking-wider transition-all">
+                  <LogOut className="w-4 h-4" /> LOGOUT
+                </button>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 };
 

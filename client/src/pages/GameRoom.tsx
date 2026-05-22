@@ -12,6 +12,7 @@ const FlappyBird = lazy(() => import('../games/flappyBird/FlappyBird'));
 const SnakeGame = lazy(() => import('../games/snake/Snake'));
 const TicTacToe = lazy(() => import('../games/ticTacToe/TicTacToe'));
 const MemoryGame = lazy(() => import('../games/memoryGame/MemoryGame'));
+const NeonSequence = lazy(() => import('../games/neonSequence/NeonSequence'));
 const ReactionGame = lazy(() => import('../games/reactionGame/ReactionGame'));
 const CatchMyHeart = lazy(() => import('../games/catchMyHeart/CatchMyHeart'));
 const RelationshipTrivia = lazy(() => import('../games/coupleGames/RelationshipTrivia'));
@@ -21,6 +22,7 @@ const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }
   snake:              { title: 'Snake',             desc: 'Classic neon snake — grow longer, don\'t crash.', icon: '🐍' },
   ticTacToe:          { title: 'Tic Tac Toe',       desc: 'Outsmart the AI on the classic 3×3 grid.',      icon: '❌' },
   memoryGame:         { title: 'Memory Cards',      desc: 'Match all pairs as fast as possible.',          icon: '🧠' },
+  neonSequence:       { title: 'Neon Sequence',     desc: 'Memorize the color sequence pattern.',          icon: '👁️' },
   reactionGame:       { title: 'Reaction Clicker',  desc: 'Click the target instantly — test your reflex.',icon: '⚡' },
   catchMyHeart:       { title: 'Catch My Heart',    desc: 'Catch falling hearts with your basket.',        icon: '🧺' },
   relationshipTrivia: { title: 'Arcade Trivia',     desc: 'Test your gaming knowledge — 5 questions.',     icon: '🎯' }
@@ -85,6 +87,8 @@ const GameRoom: React.FC = () => {
         return <TicTacToe onComplete={handleGameComplete} />;
       case 'memoryGame':
         return <MemoryGame onComplete={handleGameComplete} />;
+      case 'neonSequence':
+        return <NeonSequence onComplete={handleGameComplete} />;
       case 'reactionGame':
         return <ReactionGame onComplete={handleGameComplete} />;
       case 'catchMyHeart':

@@ -19,6 +19,7 @@ const DEFAULT_ACHIEVEMENTS: Achievement[] = [
   { id: 'snake_century',   title: 'Snake Century',            description: 'Reach a score of 100 in Snake.',                        icon: '🐍', points: 30, isUnlocked: false, category: 'gaming'  },
   { id: 'tic_winner',      title: 'Strategy Master',          description: 'Beat the AI in Tic-Tac-Toe.',                           icon: '❌', points: 20, isUnlocked: false, category: 'gaming'  },
   { id: 'memory_speed',    title: 'Photographic Memory',      description: 'Match all cards in under 30 seconds.',                  icon: '🧠', points: 40, isUnlocked: false, category: 'gaming'  },
+  { id: 'neon_god',        title: 'Neon God',                 description: 'Reach a sequence of 10 in Neon Sequence.',              icon: '👁️', points: 40, isUnlocked: false, category: 'gaming'  },
   { id: 'lightning',       title: 'Lightning Reflex',         description: 'Get a reaction time under 250ms.',                      icon: '⚡', points: 25, isUnlocked: false, category: 'gaming'  },
   { id: 'heart_hunter',    title: 'Heart Hunter',             description: 'Catch 50 hearts in Catch My Heart.',                    icon: '🧺', points: 30, isUnlocked: false, category: 'gaming'  },
   { id: 'trivia_master',   title: 'Trivia Master',            description: 'Score 100/100 in Arcade Trivia.',                       icon: '👑', points: 50, isUnlocked: false, category: 'gaming'  },
@@ -60,6 +61,8 @@ const DEFAULT_SCORES: GameScore[] = [
   { userId: 'bot-002', userDisplayName: 'PixelKing',  gameId: 'flappyBird',   score: 19,  timestamp: new Date(Date.now() - 2 * 86400000).toISOString() },
   { userId: 'bot-001', userDisplayName: 'ArcadeBot',  gameId: 'snake',        score: 145, timestamp: new Date(Date.now() - 1 * 86400000).toISOString() },
   { userId: 'bot-002', userDisplayName: 'PixelKing',  gameId: 'snake',        score: 110, timestamp: new Date().toISOString() },
+  { userId: 'bot-001', userDisplayName: 'ArcadeBot',  gameId: 'neonSequence', score: 12,  timestamp: new Date().toISOString() },
+  { userId: 'bot-002', userDisplayName: 'PixelKing',  gameId: 'neonSequence', score: 8,   timestamp: new Date().toISOString() },
   { userId: 'bot-001', userDisplayName: 'ArcadeBot',  gameId: 'reactionGame', score: 198, timestamp: new Date().toISOString() },
   { userId: 'bot-002', userDisplayName: 'PixelKing',  gameId: 'reactionGame', score: 245, timestamp: new Date().toISOString() },
   { userId: 'bot-001', userDisplayName: 'ArcadeBot',  gameId: 'catchMyHeart', score: 62,  timestamp: new Date().toISOString() },
@@ -198,9 +201,10 @@ export class MockStorage {
 
   private static checkScoreAchievements(gameId: string, score: number) {
     if (gameId === 'flappyBird'   && score >= 15)  this.unlockAchievement('flappy_pro');
-    if (gameId === 'snake'        && score >= 100)  this.unlockAchievement('snake_century');
-    if (gameId === 'ticTacToe'    && score === 1)   this.unlockAchievement('tic_winner');
-    if (gameId === 'reactionGame' && score < 250)   this.unlockAchievement('lightning');
+    if (gameId === 'snake'        && score >= 100) this.unlockAchievement('snake_century');
+    if (gameId === 'ticTacToe'    && score === 1)  this.unlockAchievement('tic_winner');
+    if (gameId === 'neonSequence' && score >= 10)  this.unlockAchievement('neon_god');
+    if (gameId === 'reactionGame' && score < 250)  this.unlockAchievement('lightning');
     if (gameId === 'catchMyHeart' && score >= 50)   this.unlockAchievement('heart_hunter');
     if (gameId === 'relationshipTrivia' && score >= 100) this.unlockAchievement('trivia_master');
     // Check points milestone
