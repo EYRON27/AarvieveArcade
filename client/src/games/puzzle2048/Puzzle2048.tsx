@@ -307,15 +307,23 @@ const Puzzle2048: React.FC<Puzzle2048Props> = ({ onComplete }) => {
         )}
       </div>
 
-      {/* Mobile Controls (Visual helper if swipe isn't obvious) */}
-      <div className="md:hidden mt-6 flex flex-col items-center gap-2 opacity-50">
-        <ArrowUp className="w-6 h-6 text-slate-500" />
+      {/* Mobile Controls */}
+      <div className="md:hidden mt-6 flex flex-col items-center gap-2">
+        <button onClick={() => move('UP')} className="p-3 bg-slate-800 rounded-xl hover:bg-slate-700 active:bg-slate-600 transition-colors shadow-lg">
+          <ArrowUp className="w-6 h-6 text-slate-300" />
+        </button>
         <div className="flex gap-12">
-          <ArrowLeft className="w-6 h-6 text-slate-500" />
-          <ArrowRight className="w-6 h-6 text-slate-500" />
+          <button onClick={() => move('LEFT')} className="p-3 bg-slate-800 rounded-xl hover:bg-slate-700 active:bg-slate-600 transition-colors shadow-lg">
+            <ArrowLeft className="w-6 h-6 text-slate-300" />
+          </button>
+          <button onClick={() => move('RIGHT')} className="p-3 bg-slate-800 rounded-xl hover:bg-slate-700 active:bg-slate-600 transition-colors shadow-lg">
+            <ArrowRight className="w-6 h-6 text-slate-300" />
+          </button>
         </div>
-        <ArrowDown className="w-6 h-6 text-slate-500" />
-        <span className="text-[10px] text-slate-500 font-bold uppercase mt-1">Swipe to play</span>
+        <button onClick={() => move('DOWN')} className="p-3 bg-slate-800 rounded-xl hover:bg-slate-700 active:bg-slate-600 transition-colors shadow-lg">
+          <ArrowDown className="w-6 h-6 text-slate-300" />
+        </button>
+        <span className="text-[10px] text-slate-500 font-bold uppercase mt-2">Tap arrows to move</span>
       </div>
 
     </div>

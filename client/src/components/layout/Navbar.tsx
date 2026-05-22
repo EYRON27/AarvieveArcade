@@ -46,15 +46,13 @@ const Navbar: React.FC = () => {
 
   useEffect(() => { setMobileMenuOpen(false); }, [location.pathname]);
 
-  if (!user) return null;
-
-  const navItems = [
+  const navItems = user ? [
     { path: '/dashboard',    label: 'Home',        icon: Gamepad2 },
     { path: '/games',        label: 'Games',       icon: Zap       },
     { path: '/leaderboard',  label: 'Scores',      icon: Trophy    },
     { path: '/achievements', label: 'Badges',      icon: Award     },
     { path: '/memories',     label: 'Gallery',    icon: Heart     },
-  ];
+  ] : [];
 
   return (
     <>
@@ -62,7 +60,7 @@ const Navbar: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-14">
 
         {/* Logo */}
-        <Link to="/dashboard" className="flex items-center gap-2.5 group">
+        <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2.5 group">
           <span className="w-7 h-7 bg-arcade-red rounded-lg flex items-center justify-center text-white font-black text-xs font-pixel">AA</span>
           <span className="font-display text-lg font-bold text-white tracking-wider group-hover:text-arcade-red transition-colors">
             Aarvieve Arcade
@@ -114,34 +112,45 @@ const Navbar: React.FC = () => {
           </button>
 
           {/* Streak */}
-          {user.streak > 0 && (
+          {user && user.streak > 0 && (
             <div className="flex items-center gap-1 border border-orange-500/25 bg-orange-500/8 rounded-lg px-2.5 py-1.5 text-orange-400 font-bold text-xs">
               <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500" />
               <span>{user.streak}d</span>
             </div>
           )}
 
-          {/* Profile */}
-          <Link
-            to="/profile"
-            className="flex items-center gap-2 border border-white/8 hover:border-arcade-blue/40 bg-white/3 hover:bg-arcade-blue/5 rounded-lg px-2.5 py-1.5 transition-all"
-          >
-            <img
-              src={user.avatarUrl}
-              alt={user.displayName}
-              className="w-6 h-6 rounded-md bg-arcade-dark border border-white/10"
-            />
-            <span className="text-xs font-semibold text-slate-300 hidden xl:block">{user.displayName}</span>
-          </Link>
-
-          {/* Logout */}
-          <button
-            onClick={logout}
-            className="p-2 rounded-lg border border-white/8 text-slate-500 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/5 transition-all"
-            title="Log Out"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          {/* Profile or Login */}
+          {user ? (
+            <>
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 border border-white/8 hover:border-arcade-blue/40 bg-white/3 hover:bg-arcade-blue/5 rounded-lg px-2.5 py-1.5 transition-all"
+              >
+                <img
+                  src={user.avatarUrl}
+                  alt={user.displayName}
+                  className="w-6 h-6 rounded-md bg-arcade-dark border border-white/10"
+                />
+                <span className="text-xs font-semibold text-slate-300 hidden xl:block">{user.displayName}</span>
+              </Link>
+              <button
+                onClick={logout}
+                className="p-2 rounded-lg border border-white/8 text-slate-500 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/5 transition-all"
+                title="Log Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition-colors">
+                Log In
+              </Link>
+              <Link to="/register" className="px-4 py-2 text-sm font-bold bg-arcade-red hover:bg-red-500 text-white rounded-lg transition-colors">
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -215,16 +224,29 @@ const Navbar: React.FC = () => {
               </div>
 
               <div className="mt-auto pt-4 border-t border-white/10 flex flex-col gap-4">
-                <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
-                  <img src={user.avatarUrl} alt={user.displayName} className="w-9 h-9 rounded-xl border border-white/10" />
-                  <div>
-                    <span className="text-sm font-bold text-slate-200 block">{user.displayName}</span>
-                    <span className="text-[10px] text-slate-500 uppercase tracking-widest">{user.totalPoints} pts</span>
-                  </div>
-                </Link>
-                <button onClick={logout} className="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-bold rounded-xl py-3 text-xs tracking-wider transition-all">
-                  <LogOut className="w-4 h-4" /> LOGOUT
-                </button>
+                {user ? (
+                  <>
+                    <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
+                      <img src={user.avatarUrl} alt={user.displayName} className="w-9 h-9 rounded-xl border border-white/10" />
+                      <div>
+                        <span className="text-sm font-bold text-slate-200 block">{user.displayName}</span>
+                        <span className="text-[10px] text-slate-500 uppercase tracking-widest">{user.totalPoints} pts</span>
+                      </div>
+                    </Link>
+                    <button onClick={logout} className="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-bold rounded-xl py-3 text-xs tracking-wider transition-all">
+                      <LogOut className="w-4 h-4" /> LOGOUT
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="w-full text-center px-4 py-3 text-sm font-bold text-slate-300 hover:text-white border border-white/10 rounded-xl transition-colors">
+                      Log In
+                    </Link>
+                    <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="w-full text-center px-4 py-3 text-sm font-bold bg-arcade-red hover:bg-red-500 text-white rounded-xl transition-colors">
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </div>
             </motion.div>
           </>

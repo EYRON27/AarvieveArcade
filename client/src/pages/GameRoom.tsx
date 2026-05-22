@@ -13,6 +13,7 @@ const SnakeGame = lazy(() => import('../games/snake/Snake'));
 const TicTacToe = lazy(() => import('../games/ticTacToe/TicTacToe'));
 const MemoryGame = lazy(() => import('../games/memoryGame/MemoryGame'));
 const Puzzle2048 = lazy(() => import('../games/puzzle2048/Puzzle2048'));
+const Sudoku = lazy(() => import('../games/sudoku/Sudoku'));
 const NeonSequence = lazy(() => import('../games/neonSequence/NeonSequence'));
 const SpaceDodger = lazy(() => import('../games/spaceDodger/SpaceDodger'));
 const BrickBreaker = lazy(() => import('../games/brickBreaker/BrickBreaker'));
@@ -27,6 +28,7 @@ const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }
   ticTacToe:          { title: 'Tic Tac Toe',       desc: 'Outsmart the AI on the classic 3×3 grid.',      icon: '❌' },
   memoryGame:         { title: 'Memory Cards',      desc: 'Match all pairs as fast as possible.',          icon: '🧠' },
   puzzle2048:         { title: '2048 Puzzle',       desc: 'Slide and merge tiles to reach 2048.',          icon: '🧩' },
+  sudoku:             { title: 'Sudoku',            desc: 'The classic 9x9 logic puzzle.',                 icon: '🔢' },
   neonSequence:       { title: 'Neon Sequence',     desc: 'Memorize the color sequence pattern.',          icon: '👁️' },
   spaceDodger:        { title: 'Space Dodger',      desc: 'Dodge the falling asteroids to survive!',       icon: '🚀' },
   brickBreaker:       { title: 'Brick Breaker',     desc: 'Smash all the bricks with the ball.',           icon: '🧱' },
@@ -97,6 +99,8 @@ const GameRoom: React.FC = () => {
         return <MemoryGame onComplete={handleGameComplete} />;
       case 'puzzle2048':
         return <Puzzle2048 onComplete={handleGameComplete} />;
+      case 'sudoku':
+        return <Sudoku onComplete={handleGameComplete} />;
       case 'neonSequence':
         return <NeonSequence onComplete={handleGameComplete} />;
       case 'spaceDodger':

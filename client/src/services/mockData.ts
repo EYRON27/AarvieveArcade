@@ -20,6 +20,7 @@ const DEFAULT_ACHIEVEMENTS: Achievement[] = [
   { id: 'tic_winner',      title: 'Strategy Master',          description: 'Beat the AI in Tic-Tac-Toe.',                           icon: '❌', points: 20, isUnlocked: false, category: 'gaming'  },
   { id: 'memory_speed',    title: 'Photographic Memory',      description: 'Match all cards in under 30 seconds.',                  icon: '🧠', points: 40, isUnlocked: false, category: 'gaming'  },
   { id: 'puzzle_master',   title: 'Puzzle Master',            description: 'Merge tiles to reach the 2048 tile.',                   icon: '🧩', points: 50, isUnlocked: false, category: 'gaming'  },
+  { id: 'sudoku_master',   title: 'Sudoku Master',            description: 'Solve a Sudoku puzzle.',                                icon: '🔢', points: 60, isUnlocked: false, category: 'gaming'  },
   { id: 'neon_god',        title: 'Neon God',                 description: 'Reach a sequence of 10 in Neon Sequence.',              icon: '👁️', points: 40, isUnlocked: false, category: 'gaming'  },
   { id: 'space_survivor',  title: 'Space Survivor',           description: 'Survive an asteroid field and score 50 points.',        icon: '🚀', points: 30, isUnlocked: false, category: 'gaming'  },
   { id: 'brick_smasher',   title: 'Demolition Expert',        description: 'Clear all the bricks to win the game.',                 icon: '🧱', points: 40, isUnlocked: false, category: 'gaming'  },
@@ -67,6 +68,7 @@ const DEFAULT_SCORES: GameScore[] = [
   { userId: 'bot-001', userDisplayName: 'ArcadeBot',  gameId: 'memoryGame',   score: 45,  timestamp: new Date().toISOString() },
   { userId: 'bot-001', userDisplayName: 'ArcadeBot',  gameId: 'puzzle2048',   score: 3450, timestamp: new Date().toISOString() },
   { userId: 'bot-002', userDisplayName: 'PixelKing',  gameId: 'puzzle2048',   score: 1024, timestamp: new Date().toISOString() },
+  { userId: 'bot-001', userDisplayName: 'ArcadeBot',  gameId: 'sudoku',       score: 750,  timestamp: new Date().toISOString() },
   { userId: 'bot-001', userDisplayName: 'ArcadeBot',  gameId: 'neonSequence', score: 12,  timestamp: new Date().toISOString() },
   { userId: 'bot-002', userDisplayName: 'PixelKing',  gameId: 'neonSequence', score: 8,   timestamp: new Date().toISOString() },
   { userId: 'bot-001', userDisplayName: 'ArcadeBot',  gameId: 'spaceDodger',  score: 65,  timestamp: new Date().toISOString() },
@@ -216,6 +218,7 @@ export class MockStorage {
     if (gameId === 'snake'        && score >= 100) this.unlockAchievement('snake_century');
     if (gameId === 'ticTacToe'    && score === 1)  this.unlockAchievement('tic_winner');
     if (gameId === 'puzzle2048'   && score >= 2048) this.unlockAchievement('puzzle_master');
+    if (gameId === 'sudoku'       && score >= 100)  this.unlockAchievement('sudoku_master');
     if (gameId === 'neonSequence' && score >= 10)  this.unlockAchievement('neon_god');
     if (gameId === 'spaceDodger'  && score >= 50)  this.unlockAchievement('space_survivor');
     if (gameId === 'brickBreaker' && score >= 800) this.unlockAchievement('brick_smasher');
