@@ -54,6 +54,10 @@ const Navbar: React.FC = () => {
     { path: '/memories',     label: 'Gallery',    icon: Heart     },
   ] : [];
 
+  if (location.pathname === '/') {
+    return null;
+  }
+
   return (
     <>
       <nav className="sticky top-0 z-40 w-full bg-arcade-darker/95 backdrop-blur-md border-b border-white/5">
