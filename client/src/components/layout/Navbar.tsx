@@ -16,6 +16,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import LoadingScreen from '../ui/LoadingScreen';
 
 const LOFI_MUSIC_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
 
@@ -25,7 +26,22 @@ const Navbar: React.FC = () => {
   const { musicEnabled, toggleMusic } = useGameStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+    if (mobileMenuOpen) setMobileMenuOpen(false);
+  };
+
+  const confirmLogout = async () => {
+    setIsLoggingOut(true);
+    await new Promise(r => setTimeout(r, 1500));
+    await logout();
+    setIsLoggingOut(false);
+    setShowLogoutConfirm(false);
+  };
 
   useEffect(() => {
     const audio = new Audio(LOFI_MUSIC_URL);
@@ -53,6 +69,10 @@ const Navbar: React.FC = () => {
     { path: '/achievements', label: 'Badges',      icon: Award     },
     { path: '/memories',     label: 'Gallery',    icon: Heart     },
   ] : [];
+
+  if (isLoggingOut) {
+    return <LoadingScreen message="Saving player data and logging out..." />;
+  }
 
   if (location.pathname === '/') {
     return null;
@@ -138,7 +158,7 @@ const Navbar: React.FC = () => {
                 <span className="text-xs font-semibold text-slate-300 hidden xl:block">{user.displayName}</span>
               </Link>
               <button
-                onClick={logout}
+                onClick={handleLogoutClick}
                 className="p-2 rounded-lg border border-white/8 text-slate-500 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/5 transition-all"
                 title="Log Out"
               >
@@ -167,12 +187,14 @@ const Navbar: React.FC = () => {
           >
             {musicEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
           </button>
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg border border-white/10 text-slate-300"
-          >
-            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-          </button>
+          {user && (
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg border border-white/10 text-slate-300"
+            >
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+          )}
         </div>
       </div>
     </nav>
@@ -237,7 +259,7 @@ const Navbar: React.FC = () => {
                         <span className="text-[10px] text-slate-500 uppercase tracking-widest">{user.totalPoints} pts</span>
                       </div>
                     </Link>
-                    <button onClick={logout} className="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-bold rounded-xl py-3 text-xs tracking-wider transition-all">
+                    <button onClick={handleLogoutClick} className="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-bold rounded-xl py-3 text-xs tracking-wider transition-all">
                       <LogOut className="w-4 h-4" /> LOGOUT
                     </button>
                   </>
@@ -254,6 +276,45 @@ const Navbar: React.FC = () => {
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-arcade-darker border border-arcade-red/30 p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center"
+            >
+              <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/30">
+                <LogOut className="w-6 h-6 text-arcade-red" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Ready to quit?</h3>
+              <p className="text-sm text-slate-400 mb-6">Are you sure you want to log out of your arcade session?</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm bg-white/5 hover:bg-white/10 text-white transition-all border border-white/10"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmLogout}
+                  className="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm bg-arcade-red hover:bg-red-500 text-white transition-all shadow-lg shadow-red-500/20"
+                >
+                  Log Out
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>

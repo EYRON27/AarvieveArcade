@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User as UserIcon, UserPlus } from 'lucide-react';
 
+import LoadingScreen from '../components/ui/LoadingScreen';
+
 const RegisterPage: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -18,12 +20,18 @@ const RegisterPage: React.FC = () => {
     if (!email || !password || !displayName) return setError('Please fill in all fields.');
     try {
       setError(''); setLoading(true);
+      await new Promise(r => setTimeout(r, 1500)); // Artificial delay for effect
       await register(email, password, displayName);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Account creation failed. Email may already be in use.');
-    } finally { setLoading(false); }
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return <LoadingScreen message="Creating player account..." />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-arcade-darker px-4 py-8">

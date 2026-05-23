@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { Mail, Lock, LogIn } from 'lucide-react';
 
+import LoadingScreen from '../components/ui/LoadingScreen';
+
 const LoginPage: React.FC = () => {
   const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
@@ -17,22 +19,30 @@ const LoginPage: React.FC = () => {
     if (!email || !password) return setError('Please enter email and password.');
     try {
       setError(''); setLoading(true);
+      await new Promise(r => setTimeout(r, 1500)); // Artificial delay for effect
       await login(email, password);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Sign in failed. Check your credentials.');
-    } finally { setLoading(false); }
+      setLoading(false);
+    }
   };
 
   const handleGoogle = async () => {
     try {
       setError(''); setLoading(true);
+      await new Promise(r => setTimeout(r, 1500)); // Artificial delay for effect
       await loginWithGoogle();
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Google sign in failed.');
-    } finally { setLoading(false); }
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return <LoadingScreen message="Authenticating player..." />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-arcade-darker px-4 py-8">
