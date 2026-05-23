@@ -1,0 +1,17 @@
+{
+  "name": "Aarvieve Arcade",
+  "short_name": "Arcade",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D0A1E",
+  "theme_color": "#0D0A1E",
+  "description": "A personalized retro gaming platform for two.",
+  "icons": [
+    {
+      "src": "/aarvievewatermark.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

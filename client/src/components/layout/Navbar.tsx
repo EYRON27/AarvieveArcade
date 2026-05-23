@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   Zap,
+  Download,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '../ui/LoadingScreen';
@@ -28,6 +29,11 @@ const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
+  // PWA Install Prompt State
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+  
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleLogoutClick = () => {
@@ -61,6 +67,40 @@ const Navbar: React.FC = () => {
   }, [musicEnabled, user]);
 
   useEffect(() => { setMobileMenuOpen(false); }, [location.pathname]);
+
+  // Handle PWA Installation
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e);
+      // Update UI notify the user they can install the PWA
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    // Show the install prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+      setIsInstallable(false);
+    } else {
+      console.log('User dismissed the install prompt');
+    }
+    // We've used the prompt, and can't use it again, throw it away
+    setDeferredPrompt(null);
+  };
 
   const navItems = user ? [
     { path: '/dashboard',    label: 'Home',        icon: Gamepad2 },
@@ -122,6 +162,17 @@ const Navbar: React.FC = () => {
 
         {/* Right side actions */}
         <div className="hidden md:flex items-center gap-2">
+          {/* Install PWA Button */}
+          {isInstallable && (
+            <button
+              onClick={handleInstallClick}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-arcade-blue/40 bg-arcade-blue/10 text-arcade-blue hover:bg-arcade-blue hover:text-white transition-all text-xs font-bold shadow-[0_0_10px_rgba(59,130,246,0.2)] animate-pulse hover:animate-none mr-2"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>INSTALL APP</span>
+            </button>
+          )}
+
           {/* Music toggle */}
           <button
             onClick={toggleMusic}
@@ -179,6 +230,15 @@ const Navbar: React.FC = () => {
 
         {/* Mobile hamburger */}
         <div className="flex lg:hidden items-center gap-2">
+          {isInstallable && (
+            <button
+              onClick={handleInstallClick}
+              className="p-2 rounded-lg border border-arcade-blue/40 bg-arcade-blue/10 text-arcade-blue shadow-[0_0_10px_rgba(59,130,246,0.2)] animate-pulse"
+              title="Install App"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+          )}
           <button
             onClick={toggleMusic}
             className={`p-2 rounded-lg border text-xs ${

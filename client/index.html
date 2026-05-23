@@ -16,6 +16,8 @@
 
     <!-- Favicon: aarvievewatermark -->
     <link rel="icon" type="image/png" href="/aarvievewatermark.png" />
+    <link rel="apple-touch-icon" href="/aarvievewatermark.png" />
+    <link rel="manifest" href="/manifest.json" />
 
     <!-- Preconnect Google Fonts for speed -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,5 +26,14 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
   </body>
 </html>
