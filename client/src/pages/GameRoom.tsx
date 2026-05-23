@@ -69,31 +69,42 @@ const GameRoom: React.FC = () => {
       setFullscreenScale(1);
       return;
     }
+
+    let resizeObserver: ResizeObserver | null = null;
+
     const updateScale = () => {
-      // Find the actual game container inside our wrapper
       const child = gameWrapperRef.current?.firstElementChild as HTMLElement;
       if (!child) return;
       
-      // Get the unscaled original size of the game (ignore previous transforms)
       const w = child.offsetWidth || 400;
       const h = child.offsetHeight || 550;
       
-      // Calculate how much we need to multiply it by to fill the window
       const scaleW = (window.innerWidth - 40) / w;
       const scaleH = (window.innerHeight - 100) / h;
       const bestScale = Math.min(scaleW, scaleH);
       
-      // We only scale up if the screen is big enough, otherwise normal size
       setFullscreenScale(Math.max(1, bestScale));
     };
 
-    // Run once immediately, then again slightly later to ensure the game finished rendering
+    // Run once immediately
     updateScale();
     const timeout = setTimeout(updateScale, 100);
+
+    // Watch for window resizes
     window.addEventListener('resize', updateScale);
+
+    // Watch for internal game size changes (like Sudoku rendering its numpad)
+    if (gameWrapperRef.current && gameWrapperRef.current.firstElementChild) {
+      resizeObserver = new ResizeObserver(() => {
+        updateScale();
+      });
+      resizeObserver.observe(gameWrapperRef.current.firstElementChild);
+    }
+
     return () => {
       clearTimeout(timeout);
       window.removeEventListener('resize', updateScale);
+      if (resizeObserver) resizeObserver.disconnect();
     };
   }, [isFullscreen, gameId]);
 
