@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User as UserIcon, UserPlus } from 'lucide-react';
+import { Mail, Lock, User as UserIcon, UserPlus, Eye, EyeOff } from 'lucide-react';
 
 import LoadingScreen from '../components/ui/LoadingScreen';
 
@@ -14,7 +14,7 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword]       = useState('');
   const [error, setError]             = useState('');
   const [loading, setLoading]         = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password || !displayName) return setError('Please fill in all fields.');
@@ -67,7 +67,7 @@ const RegisterPage: React.FC = () => {
             <div className="relative">
               <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
               <input
-                type="text" placeholder="Aaron or Genevieve" value={displayName}
+                type="text" placeholder="Enter your display name" value={displayName}
                 onChange={e => setDisplayName(e.target.value)} disabled={loading}
                 className="w-full bg-arcade-dark border border-white/8 hover:border-white/15 focus:border-arcade-blue/50 focus:outline-none rounded-lg py-3 pl-10 pr-4 text-slate-200 text-sm transition-all"
               />
@@ -79,7 +79,7 @@ const RegisterPage: React.FC = () => {
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
               <input
-                type="email" placeholder="love@arcade.com" value={email}
+                type="email" placeholder="player@arcade.com" value={email}
                 onChange={e => setEmail(e.target.value)} disabled={loading}
                 className="w-full bg-arcade-dark border border-white/8 hover:border-white/15 focus:border-arcade-blue/50 focus:outline-none rounded-lg py-3 pl-10 pr-4 text-slate-200 text-sm transition-all"
               />
@@ -91,10 +91,17 @@ const RegisterPage: React.FC = () => {
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
               <input
-                type="password" placeholder="Min 6 characters" value={password}
+                type={showPassword ? "text" : "password"} placeholder="Min 6 characters" value={password}
                 onChange={e => setPassword(e.target.value)} disabled={loading}
-                className="w-full bg-arcade-dark border border-white/8 hover:border-white/15 focus:border-arcade-blue/50 focus:outline-none rounded-lg py-3 pl-10 pr-4 text-slate-200 text-sm transition-all"
+                className="w-full bg-arcade-dark border border-white/8 hover:border-white/15 focus:border-arcade-blue/50 focus:outline-none rounded-lg py-3 pl-10 pr-10 text-slate-200 text-sm transition-all"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 focus:outline-none"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
