@@ -108,6 +108,28 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (gameState !== 'playing' || !canvasRef.current) return;
+    
+    // Support dragging via touch or mouse
+    if (e.buttons !== 1 && e.pointerType !== 'touch') return; // Only move if touching or clicking
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    // Use scaling ratio in case canvas CSS size differs from actual internal coordinate size
+    const scaleX = canvasRef.current.width / rect.width;
+    const x = (e.clientX - rect.left) * scaleX;
+    
+    const state = physicsRef.current;
+    
+    // Center the paddle under the finger/cursor
+    let newX = x - state.paddleWidth / 2;
+    if (newX < 0) newX = 0;
+    if (newX > canvasRef.current.width - state.paddleWidth) {
+      newX = canvasRef.current.width - state.paddleWidth;
+    }
+    state.paddleX = newX;
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -250,7 +272,12 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete }) => {
       </div>
 
       <div className="relative border-4 border-slate-800 rounded-3xl overflow-hidden bg-slate-900 shadow-2xl">
-        <canvas ref={canvasRef} className="block" />
+        <canvas 
+          ref={canvasRef} 
+          className="block touch-none cursor-ew-resize" 
+          onPointerMove={handlePointerMove}
+          onPointerDown={handlePointerMove}
+        />
 
         {/* Start Screen */}
         {gameState === 'idle' && (
