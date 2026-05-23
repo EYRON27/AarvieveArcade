@@ -112,3 +112,45 @@
     border: 1px solid rgba(255,255,255,0.08);
   }
 }
+
+/* ── Fullscreen Mode ── */
+/* When the game container is fullscreen, stretch everything to fill the screen */
+:fullscreen {
+  background-color: #080808;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 0 !important;
+  border: none !important;
+  padding: 0 !important;
+}
+:fullscreen > * {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Firefox */
+:-moz-full-screen {
+  background-color: #080808;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 0 !important;
+}
+/* Safari */
+:-webkit-full-screen {
+  background-color: #080808;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 0 !important;
+}

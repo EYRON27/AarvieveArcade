@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useGameStore } from '../store/gameStore';
-import { motion } from 'framer-motion';
+
 import { Trophy, ArrowLeft, Calendar, Target } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

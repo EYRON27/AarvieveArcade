@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Play, RotateCcw, HelpCircle, Delete } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Play, RotateCcw, Delete } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface SudokuProps {
   onComplete: (score: number) => void;

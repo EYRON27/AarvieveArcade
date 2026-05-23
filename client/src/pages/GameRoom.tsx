@@ -1,5 +1,6 @@
-import React, { lazy, Suspense, useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
+import { Maximize, Minimize } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useGameStore } from '../store/gameStore';
 import HeartParticles from '../components/ui/HeartParticles';
@@ -48,6 +49,28 @@ const GameRoom: React.FC = () => {
   const [scoreSaved, setScoreSaved] = useState(false);
   const [lastScore, setLastScore] = useState<number | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
+
+  // Fullscreen support
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      gameContainerRef.current?.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
 
   useEffect(() => {
     // Reset state on game change
@@ -126,10 +149,31 @@ const GameRoom: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-2 items-start">
           
           {/* Active game display container (spans 3) */}
-          <div className="lg:col-span-3 bg-slate-950 border-2 border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative min-h-[480px] flex items-center justify-center p-2 sm:p-4">
-            <Suspense fallback={<LoadingScreen message="Inserting coin cartridges..." />}>
-              {renderGame()}
-            </Suspense>
+          <div 
+            ref={gameContainerRef}
+            className={`lg:col-span-3 bg-slate-950 border-2 border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative flex items-center justify-center group transition-all ${
+              isFullscreen
+                ? 'w-full h-screen min-h-screen rounded-none border-0 p-0'
+                : 'min-h-[480px] p-2 sm:p-4'
+            }`}
+          >
+            {/* Fullscreen Toggle Button — always visible in fullscreen, hover-only otherwise */}
+            <button
+              onClick={toggleFullscreen}
+              className={`absolute top-4 right-4 z-50 p-2.5 bg-slate-900/90 hover:bg-arcade-red text-slate-300 hover:text-white rounded-xl backdrop-blur-sm border border-slate-700/50 transition-all shadow-lg ${
+                isFullscreen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus:opacity-100'
+              }`}
+              title={isFullscreen ? 'Exit Fullscreen (Esc)' : 'Fullscreen'}
+            >
+              {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+            </button>
+
+            {/* Game wrapper — stretches to fill all space in fullscreen */}
+            <div className={isFullscreen ? 'w-full h-full flex items-center justify-center' : 'w-full h-full flex items-center justify-center'}>
+              <Suspense fallback={<LoadingScreen message="Inserting coin cartridges..." />}>
+                {renderGame()}
+              </Suspense>
+            </div>
           </div>
 
           <LeaderboardSidebar 

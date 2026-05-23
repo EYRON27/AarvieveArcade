@@ -12,8 +12,8 @@ const WhackABug: React.FC<WhackABugProps> = ({ onComplete }) => {
   const [timeLeft, setTimeLeft] = useState(30);
   const [activeBugId, setActiveBugId] = useState<number | null>(null);
   
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const bugTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const bugTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const startGame = () => {
     setScore(0);
