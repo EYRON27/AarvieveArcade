@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { Maximize, Minimize } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -62,23 +62,40 @@ const GameRoom: React.FC = () => {
 
   // Calculate dynamic scale for fullscreen so the game blows up to fill the monitor
   const [fullscreenScale, setFullscreenScale] = useState(1);
+  const gameWrapperRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!isFullscreen) {
       setFullscreenScale(1);
       return;
     }
     const updateScale = () => {
-      // Typical game size is around 400px wide by 550px tall (including HUDs)
-      const scaleW = (window.innerWidth - 40) / 420;
-      const scaleH = (window.innerHeight - 100) / 580;
+      // Find the actual game container inside our wrapper
+      const child = gameWrapperRef.current?.firstElementChild as HTMLElement;
+      if (!child) return;
+      
+      // Get the unscaled original size of the game (ignore previous transforms)
+      const w = child.offsetWidth || 400;
+      const h = child.offsetHeight || 550;
+      
+      // Calculate how much we need to multiply it by to fill the window
+      const scaleW = (window.innerWidth - 40) / w;
+      const scaleH = (window.innerHeight - 100) / h;
       const bestScale = Math.min(scaleW, scaleH);
+      
       // We only scale up if the screen is big enough, otherwise normal size
       setFullscreenScale(Math.max(1, bestScale));
     };
+
+    // Run once immediately, then again slightly later to ensure the game finished rendering
     updateScale();
+    const timeout = setTimeout(updateScale, 100);
     window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
-  }, [isFullscreen]);
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('resize', updateScale);
+    };
+  }, [isFullscreen, gameId]);
 
   useEffect(() => {
     setScoreSaved(false);
@@ -157,6 +174,7 @@ const GameRoom: React.FC = () => {
           {/* Game takes ALL remaining screen height and scales up */}
           <div className="flex-1 flex items-center justify-center overflow-hidden p-6 w-full h-full">
             <div 
+              ref={gameWrapperRef}
               style={{ 
                 transform: `scale(${fullscreenScale})`, 
                 transformOrigin: 'center',
