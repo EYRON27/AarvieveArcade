@@ -10,9 +10,15 @@ const GAME_LABELS: Record<string, { label: string; icon: string }> = {
   snake:              { label: 'Snake',             icon: '🐍' },
   ticTacToe:          { label: 'Tic Tac Toe',       icon: '❌' },
   memoryGame:         { label: 'Memory Cards',      icon: '🧠' },
-  reactionGame:       { label: 'Reaction',          icon: '⚡' },
+  puzzle2048:         { label: '2048 Puzzle',       icon: '🧩' },
+  sudoku:             { label: 'Sudoku',            icon: '🔢' },
+  neonSequence:       { label: 'Neon Sequence',     icon: '👁️' },
+  spaceDodger:        { label: 'Space Dodger',      icon: '🚀' },
+  brickBreaker:       { label: 'Brick Breaker',     icon: '🧱' },
+  whackABug:          { label: 'Whack-A-Bug',       icon: '🐛' },
+  reactionGame:       { label: 'Reaction Clicker',  icon: '⚡' },
   catchMyHeart:       { label: 'Catch My Heart',    icon: '🧺' },
-  relationshipTrivia: { label: 'Couple Trivia',     icon: '💌' },
+  relationshipTrivia: { label: 'Arcade Trivia',     icon: '🎯' },
 };
 
 const Leaderboard: React.FC = () => {
