@@ -35,7 +35,27 @@ const AuthPage: React.FC = () => {
         await login(email, password);
         navigate('/dashboard');
       } catch (err: any) {
-        setError(err.message || 'Sign in failed. Check your credentials.');
+        let errorMessage = 'Sign in failed. Check your credentials.';
+        if (err.code) {
+          switch (err.code) {
+            case 'auth/invalid-credential':
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+              errorMessage = 'Invalid email or password.';
+              break;
+            case 'auth/too-many-requests':
+              errorMessage = 'Too many failed attempts. Please try again later.';
+              break;
+            case 'auth/network-request-failed':
+              errorMessage = 'Network error. Please check your connection.';
+              break;
+            default:
+              errorMessage = 'Authentication failed. Please try again.';
+          }
+        } else if (err.message && !err.message.includes('Firebase')) {
+          errorMessage = err.message;
+        }
+        setError(errorMessage);
         setLoading(false);
       }
     } else {
@@ -46,7 +66,28 @@ const AuthPage: React.FC = () => {
         await register(email, password, displayName);
         navigate('/dashboard');
       } catch (err: any) {
-        setError(err.message || 'Account creation failed. Email may already be in use.');
+        let errorMessage = 'Account creation failed. Email may already be in use.';
+        if (err.code) {
+          switch (err.code) {
+            case 'auth/email-already-in-use':
+              errorMessage = 'An account with this email already exists.';
+              break;
+            case 'auth/invalid-email':
+              errorMessage = 'Please enter a valid email address.';
+              break;
+            case 'auth/weak-password':
+              errorMessage = 'Password should be at least 6 characters.';
+              break;
+            case 'auth/network-request-failed':
+              errorMessage = 'Network error. Please check your connection.';
+              break;
+            default:
+              errorMessage = 'Registration failed. Please try again.';
+          }
+        } else if (err.message && !err.message.includes('Firebase')) {
+          errorMessage = err.message;
+        }
+        setError(errorMessage);
         setLoading(false);
       }
     }
