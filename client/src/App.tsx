@@ -11,8 +11,7 @@ import LoadingScreen from './components/ui/LoadingScreen';
 // Lazy-loaded pages for code splitting
 // ──────────────────────────────────────────────────────────────────────────────
 const LandingPage       = lazy(() => import('./pages/LandingPage'));
-const LoginPage         = lazy(() => import('./pages/LoginPage'));
-const RegisterPage      = lazy(() => import('./pages/RegisterPage'));
+const AuthPage          = lazy(() => import('./pages/AuthPage'));
 const Dashboard         = lazy(() => import('./pages/Dashboard'));
 const GamesLibrary      = lazy(() => import('./pages/GamesLibrary'));
 const GameRoom          = lazy(() => import('./pages/GameRoom'));
@@ -74,7 +73,7 @@ const AppRoutes: React.FC = () => {
               path="/login"
               element={
                 <PageTransition>
-                  <LoginPage />
+                  <AuthPage />
                 </PageTransition>
               }
             />
@@ -82,7 +81,7 @@ const AppRoutes: React.FC = () => {
               path="/register"
               element={
                 <PageTransition>
-                  <RegisterPage />
+                  <AuthPage />
                 </PageTransition>
               }
             />
