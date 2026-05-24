@@ -20,6 +20,7 @@ const AuthPage: React.FC = () => {
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail]             = useState('');
   const [password, setPassword]       = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError]             = useState('');
   const [loading, setLoading]         = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -59,7 +60,8 @@ const AuthPage: React.FC = () => {
         setLoading(false);
       }
     } else {
-      if (!email || !password || !displayName) return setError('Please fill in all fields.');
+      if (!email || !password || !displayName || !confirmPassword) return setError('Please fill in all fields.');
+      if (password !== confirmPassword) return setError('Passwords do not match.');
       try {
         setLoading(true);
         await new Promise(r => setTimeout(r, 1500)); // Artificial delay for effect
@@ -96,6 +98,8 @@ const AuthPage: React.FC = () => {
   const handleToggle = (toLogin: boolean) => {
     setError('');
     setIsLogin(toLogin);
+    setPassword('');
+    setConfirmPassword('');
     // Optional: update URL without navigating
     window.history.pushState(null, '', toLogin ? '/login' : '/register');
   };
@@ -105,14 +109,14 @@ const AuthPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-arcade-darker px-4 py-8">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-arcade-darker px-4 py-8 overflow-y-auto">
       {/* Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:40px_40px] pointer-events-none" />
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:40px_40px] pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 w-full max-w-sm"
+        className="relative z-10 w-full max-w-sm my-auto shrink-0"
       >
         {/* Header */}
         <div className="text-center mb-6">
@@ -228,6 +232,29 @@ const AuthPage: React.FC = () => {
               </button>
             </div>
           </div>
+
+          <AnimatePresence mode="popLayout" initial={false}>
+            {!isLogin && (
+              <motion.div
+                key="confirmPasswordField"
+                initial={{ opacity: 0, y: -10, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: 'auto' }}
+                exit={{ opacity: 0, y: -10, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col gap-1 overflow-hidden"
+              >
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">Confirm Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                  <input
+                    type={showPassword ? "text" : "password"} placeholder="Confirm your password" value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)} disabled={loading}
+                    className="w-full bg-arcade-dark border border-white/8 hover:border-white/15 focus:border-arcade-blue/50 focus:outline-none rounded-lg py-3 pl-10 pr-10 text-slate-200 text-sm transition-all"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <button
             type="submit" disabled={loading}
