@@ -43,9 +43,11 @@ interface GameStoreState {
   activeGameId: string | null;
   loadingData:  boolean;
   showConfetti: boolean;
+  isGameMusicPlaying: boolean;
 
   toggleMusic:      () => void;
   setActiveGameId:  (gameId: string | null) => void;
+  setIsGameMusicPlaying: (isPlaying: boolean) => void;
   triggerConfetti:  () => void;
   fetchInitialData: (userId: string) => Promise<void>;
   saveGameScore:    (userId: string, displayName: string, gameId: string, score: number) => Promise<GameScore>;
@@ -60,9 +62,11 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   activeGameId: null,
   loadingData:  false,
   showConfetti: false,
+  isGameMusicPlaying: false,
 
   toggleMusic:     () => set(s => ({ musicEnabled: !s.musicEnabled })),
   setActiveGameId: (gameId) => set({ activeGameId: gameId }),
+  setIsGameMusicPlaying: (isPlaying) => set({ isGameMusicPlaying: isPlaying }),
 
   triggerConfetti: () => {
     set({ showConfetti: true });

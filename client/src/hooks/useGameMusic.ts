@@ -103,7 +103,7 @@ const GAME_MUSIC: Record<string, MusicDef> = {
 
 // ── Hook ─────────────────────────────────────────────────────────────────
 export function useGameMusic(gameId: string | undefined, isActive: boolean) {
-  const { musicEnabled } = useGameStore();
+  const { musicEnabled, setIsGameMusicPlaying } = useGameStore();
   const ctxRef     = useRef<AudioContext | null>(null);
   const masterRef  = useRef<GainNode | null>(null);
   const schedulerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -125,7 +125,8 @@ export function useGameMusic(gameId: string | undefined, isActive: boolean) {
       } catch (_) {}
     }
     isPlayingRef.current = false;
-  }, []);
+    setIsGameMusicPlaying(false);
+  }, [setIsGameMusicPlaying]);
 
   const startMusic = useCallback(() => {
     if (isPlayingRef.current) return;
@@ -150,6 +151,7 @@ export function useGameMusic(gameId: string | undefined, isActive: boolean) {
     const beatDuration = 60 / def.bpm / 4; // 16th note duration in seconds
     stepRef.current = 0;
     isPlayingRef.current = true;
+    setIsGameMusicPlaying(true);
 
     const playNote = (freq: number, vol: number, wave: OscillatorType, time: number, duration: number) => {
       if (!ctx || !masterRef.current) return;
@@ -182,7 +184,7 @@ export function useGameMusic(gameId: string | undefined, isActive: boolean) {
       }
       stepRef.current = step + 1;
     }, beatDuration * 1000);
-  }, [getDef, musicEnabled]);
+  }, [getDef, musicEnabled, setIsGameMusicPlaying]);
 
   // Start/stop based on isActive
   useEffect(() => {

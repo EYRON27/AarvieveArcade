@@ -24,7 +24,7 @@ const LOFI_MUSIC_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const { musicEnabled, toggleMusic } = useGameStore();
+  const { musicEnabled, toggleMusic, isGameMusicPlaying } = useGameStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -59,12 +59,12 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     if (!audioRef.current) return;
-    if (musicEnabled && user) {
+    if (musicEnabled && user && !isGameMusicPlaying) {
       audioRef.current.play().catch(() => {});
     } else {
       audioRef.current.pause();
     }
-  }, [musicEnabled, user]);
+  }, [musicEnabled, user, isGameMusicPlaying]);
 
   useEffect(() => { setMobileMenuOpen(false); }, [location.pathname]);
 
