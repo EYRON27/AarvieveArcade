@@ -4,9 +4,11 @@ import { motion } from 'framer-motion';
 
 interface SpaceDodgerProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
-const SpaceDodger: React.FC<SpaceDodgerProps> = ({ onComplete }) => {
+const SpaceDodger: React.FC<SpaceDodgerProps> = ({ onComplete, onStart, isPaused = false }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
@@ -44,6 +46,7 @@ const SpaceDodger: React.FC<SpaceDodgerProps> = ({ onComplete }) => {
     };
     setScore(0);
     setGameState('playing');
+    onStart?.();
   };
 
   useEffect(() => {
@@ -106,7 +109,7 @@ const SpaceDodger: React.FC<SpaceDodgerProps> = ({ onComplete }) => {
 
       const state = physicsRef.current;
 
-      if (gameState === 'playing') {
+      if (gameState === 'playing' && !isPaused) {
         // Player movement
         if (state.movingLeft) state.playerX -= state.playerSpeed;
         if (state.movingRight) state.playerX += state.playerSpeed;
@@ -225,7 +228,7 @@ const SpaceDodger: React.FC<SpaceDodgerProps> = ({ onComplete }) => {
     draw();
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [gameState]);
+  }, [gameState, isPaused]);
 
   return (
     <div ref={containerRef} className="w-full flex flex-col items-center select-none py-4">

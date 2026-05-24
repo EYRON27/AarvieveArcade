@@ -4,9 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface WhackABugProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
-const WhackABug: React.FC<WhackABugProps> = ({ onComplete }) => {
+const WhackABug: React.FC<WhackABugProps> = ({ onComplete, onStart, isPaused = false }) => {
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
@@ -20,6 +22,7 @@ const WhackABug: React.FC<WhackABugProps> = ({ onComplete }) => {
     setTimeLeft(30);
     setActiveBugId(null);
     setGameState('playing');
+    onStart?.();
   };
 
   const spawnBug = () => {
@@ -40,7 +43,7 @@ const WhackABug: React.FC<WhackABugProps> = ({ onComplete }) => {
   };
 
   useEffect(() => {
-    if (gameState === 'playing') {
+    if (gameState === 'playing' && !isPaused) {
       spawnBug();
       timerRef.current = setInterval(() => {
         setTimeLeft(prev => {
@@ -52,13 +55,16 @@ const WhackABug: React.FC<WhackABugProps> = ({ onComplete }) => {
           return prev - 1;
         });
       }, 1000);
+    } else if (isPaused) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (bugTimerRef.current) clearTimeout(bugTimerRef.current);
     }
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (bugTimerRef.current) clearTimeout(bugTimerRef.current);
     };
-  }, [gameState]);
+  }, [gameState, isPaused]);
 
   // When gameover, bubble up the score
   useEffect(() => {
@@ -68,7 +74,7 @@ const WhackABug: React.FC<WhackABugProps> = ({ onComplete }) => {
   }, [gameState, score, onComplete]);
 
   const handleWhack = (id: number) => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || isPaused) return;
     if (activeBugId === id) {
       setScore(s => s + 1);
       setActiveBugId(null);

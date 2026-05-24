@@ -4,9 +4,11 @@ import { motion } from 'framer-motion';
 
 interface FlappyBirdProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
-const FlappyBird: React.FC<FlappyBirdProps> = ({ onComplete }) => {
+const FlappyBird: React.FC<FlappyBirdProps> = ({ onComplete, onStart, isPaused = false }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
@@ -29,6 +31,7 @@ const FlappyBird: React.FC<FlappyBirdProps> = ({ onComplete }) => {
   });
 
   const triggerJump = () => {
+    if (isPaused) return;
     if (gameState === 'idle') {
       physicsRef.current.birdY = 200;
       physicsRef.current.birdVelocity = physicsRef.current.jumpPower;
@@ -36,6 +39,7 @@ const FlappyBird: React.FC<FlappyBirdProps> = ({ onComplete }) => {
       physicsRef.current.score = 0;
       setScore(0);
       setGameState('playing');
+      onStart?.();
     } else if (gameState === 'playing') {
       physicsRef.current.birdVelocity = physicsRef.current.jumpPower;
     }
@@ -97,7 +101,7 @@ const FlappyBird: React.FC<FlappyBirdProps> = ({ onComplete }) => {
 
       // 2. Physics & Pipes logic
       const state = physicsRef.current;
-      if (gameState === 'playing') {
+      if (gameState === 'playing' && !isPaused) {
         // Apply gravity
         state.birdVelocity += state.gravity;
         state.birdY += state.birdVelocity;
@@ -243,7 +247,7 @@ const FlappyBird: React.FC<FlappyBirdProps> = ({ onComplete }) => {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [gameState]);
+  }, [gameState, isPaused]);
 
   return (
     <div ref={containerRef} className="w-full flex flex-col items-center select-none">

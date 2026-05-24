@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface NeonSequenceProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
 const COLORS = [
@@ -13,7 +15,7 @@ const COLORS = [
   { id: 3, color: 'bg-yellow-500',   active: 'bg-yellow-300 shadow-[0_0_40px_rgba(234,179,8,0.8)]', soundFreq: 523.25 }  // C5
 ];
 
-const NeonSequence: React.FC<NeonSequenceProps> = ({ onComplete }) => {
+const NeonSequence: React.FC<NeonSequenceProps> = ({ onComplete, onStart, isPaused = false }) => {
   const [gameState, setGameState] = useState<'idle' | 'showing' | 'waiting' | 'gameover'>('idle');
   const [sequence, setSequence] = useState<number[]>([]);
   const [playerIdx, setPlayerIdx] = useState(0);
@@ -56,6 +58,7 @@ const NeonSequence: React.FC<NeonSequenceProps> = ({ onComplete }) => {
     setScore(0);
     setSequence([]);
     nextRound([]);
+    onStart?.();
   };
 
   const nextRound = (currentSeq: number[]) => {
@@ -88,7 +91,7 @@ const NeonSequence: React.FC<NeonSequenceProps> = ({ onComplete }) => {
   };
 
   const handlePadClick = (colorId: number) => {
-    if (gameState !== 'waiting') return;
+    if (gameState !== 'waiting' || isPaused) return;
 
     // Visual/Audio feedback
     setActivePad(colorId);

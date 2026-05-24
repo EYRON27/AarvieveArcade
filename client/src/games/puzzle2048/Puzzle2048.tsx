@@ -4,11 +4,13 @@ import { motion } from 'framer-motion';
 
 interface Puzzle2048Props {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
 type Grid = number[][];
 
-const Puzzle2048: React.FC<Puzzle2048Props> = ({ onComplete }) => {
+const Puzzle2048: React.FC<Puzzle2048Props> = ({ onComplete, onStart, isPaused = false }) => {
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover' | 'won'>('idle');
   const [grid, setGrid] = useState<Grid>(
     Array(4).fill(null).map(() => Array(4).fill(0))
@@ -23,6 +25,7 @@ const Puzzle2048: React.FC<Puzzle2048Props> = ({ onComplete }) => {
     setGrid(newGrid);
     setScore(0);
     setGameState('playing');
+    onStart?.();
   };
 
   const getEmptyCells = (currentGrid: Grid) => {
@@ -50,7 +53,7 @@ const Puzzle2048: React.FC<Puzzle2048Props> = ({ onComplete }) => {
 
   // Move Logic
   const move = (direction: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT') => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || isPaused) return;
 
     let newGrid = grid.map(row => [...row]);
     let moved = false;

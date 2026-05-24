@@ -1,10 +1,11 @@
 import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
-import { Maximize, Minimize } from 'lucide-react';
+import { Maximize, Minimize, Pause, Play } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useGameStore } from '../store/gameStore';
 import HeartParticles from '../components/ui/HeartParticles';
 import LoadingScreen from '../components/ui/LoadingScreen';
+import { useGameMusic } from '../hooks/useGameMusic';
 
 import GameHeader from '../components/gameRoom/GameHeader';
 import LeaderboardSidebar from '../components/gameRoom/LeaderboardSidebar';
@@ -50,15 +51,23 @@ const GameRoom: React.FC = () => {
   const [lastScore, setLastScore] = useState<number | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
 
-  // Listen for Esc key to exit fullscreen overlay
+  // Music: plays only after game has started and not paused
+  useGameMusic(gameId, gameStarted && !isPaused && !showSaveModal);
+
+  // Listen for Esc key to exit fullscreen overlay; P to pause/resume
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isFullscreen) setIsFullscreen(false);
+      if (e.key === 'p' || e.key === 'P') {
+        if (gameStarted) setIsPaused(p => !p);
+      }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [isFullscreen]);
+  }, [isFullscreen, gameStarted]);
 
   // Calculate dynamic scale for fullscreen so the game blows up to fill the monitor
   const [fullscreenScale, setFullscreenScale] = useState(1);
@@ -112,6 +121,8 @@ const GameRoom: React.FC = () => {
     setScoreSaved(false);
     setLastScore(null);
     setShowSaveModal(false);
+    setIsPaused(false);
+    setGameStarted(false);
   }, [gameId]);
 
   if (!user || !gameId || !GAME_METRICS[gameId]) {
@@ -130,6 +141,13 @@ const GameRoom: React.FC = () => {
     setLastScore(score);
     setShowSaveModal(true);
     setScoreSaved(false);
+    setIsPaused(false);
+    setGameStarted(false);
+  };
+
+  const handleGameStart = () => {
+    setIsPaused(false);
+    setGameStarted(true);
   };
 
   const handleSaveScore = async () => {
@@ -146,19 +164,19 @@ const GameRoom: React.FC = () => {
 
   const renderGame = () => {
     switch (gameId) {
-      case 'flappyBird':        return <FlappyBird onComplete={handleGameComplete} />;
-      case 'snake':             return <SnakeGame onComplete={handleGameComplete} />;
-      case 'ticTacToe':         return <TicTacToe onComplete={handleGameComplete} />;
-      case 'memoryGame':        return <MemoryGame onComplete={handleGameComplete} />;
-      case 'puzzle2048':        return <Puzzle2048 onComplete={handleGameComplete} />;
-      case 'sudoku':            return <Sudoku onComplete={handleGameComplete} />;
-      case 'neonSequence':      return <NeonSequence onComplete={handleGameComplete} />;
-      case 'spaceDodger':       return <SpaceDodger onComplete={handleGameComplete} />;
-      case 'brickBreaker':      return <BrickBreaker onComplete={handleGameComplete} />;
-      case 'whackABug':         return <WhackABug onComplete={handleGameComplete} />;
-      case 'reactionGame':      return <ReactionGame onComplete={handleGameComplete} />;
-      case 'catchMyHeart':      return <CatchMyHeart onComplete={handleGameComplete} />;
-      case 'relationshipTrivia':return <RelationshipTrivia onComplete={handleGameComplete} />;
+      case 'flappyBird':        return <FlappyBird onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'snake':             return <SnakeGame onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'ticTacToe':         return <TicTacToe onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'memoryGame':        return <MemoryGame onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'puzzle2048':        return <Puzzle2048 onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'sudoku':            return <Sudoku onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'neonSequence':      return <NeonSequence onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'spaceDodger':       return <SpaceDodger onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'brickBreaker':      return <BrickBreaker onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'whackABug':         return <WhackABug onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'reactionGame':      return <ReactionGame onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'catchMyHeart':      return <CatchMyHeart onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'relationshipTrivia':return <RelationshipTrivia onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
       default:                  return <div>Game under maintenance</div>;
     }
   };
@@ -215,7 +233,7 @@ const GameRoom: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-2 items-start">
             {/* Game container */}
             <div className="lg:col-span-3 bg-slate-950 border-2 border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative min-h-[480px] flex items-center justify-center p-2 sm:p-4 group">
-              {/* Fullscreen button — visible on mobile, hover on desktop */}
+              {/* Fullscreen button */}
               <button
                 onClick={() => setIsFullscreen(true)}
                 className="absolute top-4 right-4 z-50 p-2.5 bg-slate-900/90 hover:bg-arcade-green text-slate-300 hover:text-white rounded-xl backdrop-blur-sm border border-slate-700/50 transition-all shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100"
@@ -223,6 +241,36 @@ const GameRoom: React.FC = () => {
               >
                 <Maximize className="w-5 h-5" />
               </button>
+
+              {/* Pause/Resume button — only show when game has started */}
+              {gameStarted && (
+                <button
+                  onClick={() => setIsPaused(p => !p)}
+                  className={`absolute top-4 right-16 z-50 p-2.5 backdrop-blur-sm border rounded-xl transition-all shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 ${
+                    isPaused
+                      ? 'bg-arcade-green/20 hover:bg-arcade-green text-arcade-green hover:text-white border-arcade-green/50'
+                      : 'bg-slate-900/90 hover:bg-amber-500 text-slate-300 hover:text-white border-slate-700/50'
+                  }`}
+                  title={isPaused ? 'Resume (P)' : 'Pause (P)'}
+                >
+                  {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+                </button>
+              )}
+
+              {/* Paused overlay */}
+              {isPaused && (
+                <div className="absolute inset-0 z-40 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center gap-4 rounded-3xl">
+                  <span className="text-5xl">⏸️</span>
+                  <h3 className="font-pixel text-sm text-white uppercase tracking-widest">PAUSED</h3>
+                  <button
+                    onClick={() => setIsPaused(false)}
+                    className="flex items-center gap-2 bg-arcade-green hover:bg-emerald-400 text-black font-bold rounded-2xl px-6 py-3 text-sm transition-all"
+                  >
+                    <Play className="w-4 h-4 fill-black" />
+                    RESUME
+                  </button>
+                </div>
+              )}
 
               <div className="absolute inset-0 flex items-center justify-center">
                 <Suspense fallback={<LoadingScreen message="Inserting coin cartridges..." />}>

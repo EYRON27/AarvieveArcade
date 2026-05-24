@@ -4,6 +4,8 @@ import { Play, RotateCcw } from 'lucide-react';
 
 interface MemoryGameProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
 interface Card {
@@ -15,7 +17,7 @@ interface Card {
 
 const MEMORY_SYMBOLS = ['💖', '🧁', '🍿', '🗼', '🧸', '🌹'];
 
-const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete }) => {
+const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused = false }) => {
   const [cards, setCards] = useState<Card[]>([]);
   const [selectedCards, setSelectedCards] = useState<number[]>([]);
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
@@ -36,11 +38,12 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete }) => {
     setSelectedCards([]);
     setSeconds(0);
     setGameState('playing');
+    onStart?.();
   };
 
   // Stopwatch timer
   useEffect(() => {
-    if (gameState === 'playing') {
+    if (gameState === 'playing' && !isPaused) {
       timerRef.current = setInterval(() => {
         setSeconds(prev => prev + 1);
       }, 1000);
@@ -48,7 +51,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete }) => {
       clearInterval(timerRef.current);
     }
     return () => clearInterval(timerRef.current);
-  }, [gameState]);
+  }, [gameState, isPaused]);
 
   // Check matching rules
   useEffect(() => {
@@ -90,7 +93,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete }) => {
   }, [selectedCards, cards, seconds]);
 
   const handleCardClick = (idx: number) => {
-    if (cards[idx].isFlipped || cards[idx].isMatched || selectedCards.length >= 2 || gameState !== 'playing') return;
+    if (isPaused || cards[idx].isFlipped || cards[idx].isMatched || selectedCards.length >= 2 || gameState !== 'playing') return;
 
     setCards(prev => {
       const next = [...prev];

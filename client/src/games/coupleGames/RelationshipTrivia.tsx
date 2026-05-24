@@ -3,6 +3,8 @@ import { Play, RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
 
 interface ArcadeTriviaProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
 interface Question {
@@ -51,7 +53,7 @@ const TRIVIA_QUESTIONS: Question[] = [
   }
 ];
 
-const ArcadeTrivia: React.FC<ArcadeTriviaProps> = ({ onComplete }) => {
+const ArcadeTrivia: React.FC<ArcadeTriviaProps> = ({ onComplete, onStart, isPaused = false }) => {
   const [gameState, setGameState]   = useState<'idle' | 'playing' | 'gameover'>('idle');
   const [currentIdx, setCurrentIdx] = useState(0);
   const [score, setScore]           = useState(0);
@@ -61,10 +63,11 @@ const ArcadeTrivia: React.FC<ArcadeTriviaProps> = ({ onComplete }) => {
   const startQuiz = () => {
     setCurrentIdx(0); setScore(0); setSelected(null); setIsLocked(false);
     setGameState('playing');
+    onStart?.();
   };
 
   const handleOption = (idx: number) => {
-    if (isLocked) return;
+    if (isLocked || isPaused) return;
     setSelected(idx); setIsLocked(true);
     const q = TRIVIA_QUESTIONS[currentIdx];
     let next = score;

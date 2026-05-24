@@ -165,6 +165,31 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         .slice(0, 10);
       updatedScores[gameId] = list;
       set({ scores: updatedScores });
+
+      // ── Check and unlock achievements (real Firebase path) ──────────────
+      const unlock = (id: string) => get().unlockAchievement(userId, id);
+      if (gameId === 'flappyBird'         && score >= 15)  unlock('flappy_pro');
+      if (gameId === 'snake'              && score >= 100) unlock('snake_century');
+      if (gameId === 'ticTacToe'          && score === 1)  unlock('tic_winner');
+      if (gameId === 'memoryGame'         && score <= 30)  unlock('memory_speed'); // score = seconds taken
+      if (gameId === 'puzzle2048'         && score >= 2048)unlock('puzzle_master');
+      if (gameId === 'sudoku'             && score >= 100) unlock('sudoku_master');
+      if (gameId === 'neonSequence'       && score >= 10)  unlock('neon_god');
+      if (gameId === 'spaceDodger'        && score >= 50)  unlock('space_survivor');
+      if (gameId === 'brickBreaker'       && score >= 800) unlock('brick_smasher');
+      if (gameId === 'whackABug'          && score >= 30)  unlock('bug_squasher');
+      if (gameId === 'reactionGame'       && score < 250)  unlock('lightning');
+      if (gameId === 'catchMyHeart'       && score >= 50)  unlock('heart_hunter');
+      if (gameId === 'relationshipTrivia' && score >= 100) unlock('trivia_master');
+
+      // Perfectionist: personal best in 3+ different games
+      const allScores = { ...updatedScores };
+      const gamesWithPersonalBest = ALL_GAME_IDS.filter(gId => {
+        const gameList = allScores[gId] || [];
+        return gameList.some(s => s.userId === userId);
+      });
+      if (gamesWithPersonalBest.length >= 3) unlock('perfectionist');
+
       return { id: ref.id, ...data };
     } catch (e) {
       console.error('Score save failed, using local fallback:', e);

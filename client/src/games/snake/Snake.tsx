@@ -3,11 +3,13 @@ import { Play, RotateCcw } from 'lucide-react';
 
 interface SnakeProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
 type Point = { x: number; y: number };
 
-const SnakeGame: React.FC<SnakeProps> = ({ onComplete }) => {
+const SnakeGame: React.FC<SnakeProps> = ({ onComplete, onStart, isPaused = false }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
@@ -77,7 +79,7 @@ const SnakeGame: React.FC<SnakeProps> = ({ onComplete }) => {
 
   // Main game tick timer loop
   useEffect(() => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || isPaused) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -129,7 +131,7 @@ const SnakeGame: React.FC<SnakeProps> = ({ onComplete }) => {
 
     let timerId = setTimeout(tick, physicsRef.current.speed);
     return () => clearTimeout(timerId);
-  }, [gameState]);
+  }, [gameState, isPaused]);
 
   // Canvas drawing loop
   useEffect(() => {
@@ -236,6 +238,7 @@ const SnakeGame: React.FC<SnakeProps> = ({ onComplete }) => {
     setScore(0);
     generateFood(canvas.width, canvas.height);
     setGameState('playing');
+    onStart?.();
   };
 
   return (

@@ -4,11 +4,13 @@ import { Play, RotateCcw } from 'lucide-react';
 
 interface TicTacToeProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
 type BoardState = ('💖' | '⭐' | null)[];
 
-const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete }) => {
+const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = false }) => {
   const [board, setBoard] = useState<BoardState>(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [winner, setWinner] = useState<'💖' | '⭐' | 'TIE' | null>(null);
@@ -86,7 +88,7 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete }) => {
   };
 
   const handleCellClick = (index: number) => {
-    if (board[index] || winner || !isPlayerTurn || gameState !== 'playing') return;
+    if (isPaused || board[index] || winner || !isPlayerTurn || gameState !== 'playing') return;
 
     // 1. Player moves
     const newBoard = [...board];
@@ -136,6 +138,7 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete }) => {
     setIsPlayerTurn(true);
     setWinner(null);
     setGameState('playing');
+    onStart?.();
   };
 
   return (

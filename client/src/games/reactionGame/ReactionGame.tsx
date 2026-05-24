@@ -3,11 +3,13 @@ import { Play, RotateCcw } from 'lucide-react';
 
 interface ReactionGameProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
 type ReactionState = 'idle' | 'waiting' | 'ready' | 'result' | 'early';
 
-const ReactionGame: React.FC<ReactionGameProps> = ({ onComplete }) => {
+const ReactionGame: React.FC<ReactionGameProps> = ({ onComplete, onStart, isPaused = false }) => {
   const [stage, setStage] = useState<ReactionState>('idle');
   const [ms, setMs] = useState<number | null>(null);
   
@@ -17,6 +19,7 @@ const ReactionGame: React.FC<ReactionGameProps> = ({ onComplete }) => {
   const startTest = () => {
     setStage('waiting');
     setMs(null);
+    onStart?.();
 
     // Random delay between 1.8s and 4.5s
     const delay = Math.random() * 2700 + 1800;
@@ -27,6 +30,7 @@ const ReactionGame: React.FC<ReactionGameProps> = ({ onComplete }) => {
   };
 
   const handleBoxClick = () => {
+    if (isPaused) return;
     if (stage === 'waiting') {
       // Clicked too early!
       clearTimeout(timeoutRef.current);

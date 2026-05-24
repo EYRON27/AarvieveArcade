@@ -3,6 +3,8 @@ import { Play, RotateCcw } from 'lucide-react';
 
 interface CatchMyHeartProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
 interface HeartItem {
@@ -12,7 +14,7 @@ interface HeartItem {
   speed: number;
 }
 
-const CatchMyHeart: React.FC<CatchMyHeartProps> = ({ onComplete }) => {
+const CatchMyHeart: React.FC<CatchMyHeartProps> = ({ onComplete, onStart, isPaused = false }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
@@ -113,7 +115,7 @@ const CatchMyHeart: React.FC<CatchMyHeartProps> = ({ onComplete }) => {
 
       const state = physicsRef.current;
 
-      if (gameState === 'playing') {
+      if (gameState === 'playing' && !isPaused) {
         // Move basket with keyboard arrows
         const basketSpeed = 6;
         if (state.keys.ArrowLeft) {
@@ -202,7 +204,7 @@ const CatchMyHeart: React.FC<CatchMyHeartProps> = ({ onComplete }) => {
       canvas.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(frameId);
     };
-  }, [gameState]);
+  }, [gameState, isPaused]);
 
   const startGame = () => {
     physicsRef.current.basketX = 180;
@@ -213,6 +215,7 @@ const CatchMyHeart: React.FC<CatchMyHeartProps> = ({ onComplete }) => {
     setScore(0);
     setLives(5);
     setGameState('playing');
+    onStart?.();
   };
 
   return (

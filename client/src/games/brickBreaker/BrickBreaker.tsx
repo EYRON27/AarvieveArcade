@@ -4,9 +4,11 @@ import { motion } from 'framer-motion';
 
 interface BrickBreakerProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
-const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete }) => {
+const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaused = false }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover' | 'won'>('idle');
@@ -75,6 +77,7 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete }) => {
     };
     setScore(0);
     setGameState('playing');
+    onStart?.();
   };
 
   useEffect(() => {
@@ -146,7 +149,7 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete }) => {
       ctx.fillStyle = '#0f172a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      if (gameState === 'playing') {
+      if (gameState === 'playing' && !isPaused) {
         // Paddle movement
         if (state.movingLeft && state.paddleX > 0) state.paddleX -= state.paddleSpeed;
         if (state.movingRight && state.paddleX + state.paddleWidth < canvas.width) state.paddleX += state.paddleSpeed;
@@ -255,7 +258,7 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete }) => {
     draw();
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [gameState]);
+  }, [gameState, isPaused]);
 
   return (
     <div ref={containerRef} className="w-full flex flex-col items-center select-none py-4">

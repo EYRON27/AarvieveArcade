@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 
 interface SudokuProps {
   onComplete: (score: number) => void;
+  onStart?: () => void;
+  isPaused?: boolean;
 }
 
 type Cell = {
@@ -13,7 +15,7 @@ type Cell = {
 
 type Board = Cell[][];
 
-const Sudoku: React.FC<SudokuProps> = ({ onComplete }) => {
+const Sudoku: React.FC<SudokuProps> = ({ onComplete, onStart, isPaused = false }) => {
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'won'>('idle');
   const [board, setBoard] = useState<Board>([]);
   const [selectedCell, setSelectedCell] = useState<{ r: number; c: number } | null>(null);
@@ -123,17 +125,18 @@ const Sudoku: React.FC<SudokuProps> = ({ onComplete }) => {
     setScore(0);
     setTime(0);
     setSelectedCell(null);
+    onStart?.();
   };
 
   // Timer
   useEffect(() => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || isPaused) return;
     const interval = setInterval(() => setTime(t => t + 1), 1000);
     return () => clearInterval(interval);
-  }, [gameState]);
+  }, [gameState, isPaused]);
 
   const handleInput = useCallback((num: number) => {
-    if (gameState !== 'playing' || !selectedCell) return;
+    if (gameState !== 'playing' || !selectedCell || isPaused) return;
     const { r, c } = selectedCell;
     if (board[r][c].isInitial) return;
 
