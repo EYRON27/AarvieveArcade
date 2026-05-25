@@ -44,7 +44,7 @@ const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }
 
 const GameRoom: React.FC = () => {
   const { gameId } = useParams<{ gameId: string }>();
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const { scores, saveGameScore } = useGameStore();
 
   const [scoreSaved, setScoreSaved] = useState(false);
@@ -56,6 +56,38 @@ const GameRoom: React.FC = () => {
 
   // Music: plays only after game has started and not paused
   useGameMusic(gameId, gameStarted && !isPaused && !showSaveModal);
+
+  // Track Playtime
+  const playtimeRef = useRef(user?.totalPlaytime || 0);
+  useEffect(() => {
+    if (user?.totalPlaytime !== undefined) {
+      playtimeRef.current = user.totalPlaytime;
+    }
+  }, [user?.totalPlaytime]);
+
+  useEffect(() => {
+    if (!gameStarted || isPaused || !user) return;
+
+    let secondsAccumulated = 0;
+    const interval = setInterval(() => {
+      secondsAccumulated += 1;
+      if (secondsAccumulated >= 10) {
+        const newTotal = playtimeRef.current + secondsAccumulated;
+        updateProfile({ totalPlaytime: newTotal });
+        playtimeRef.current = newTotal; // update ref immediately
+        secondsAccumulated = 0;
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+      if (secondsAccumulated > 0) {
+        const newTotal = playtimeRef.current + secondsAccumulated;
+        updateProfile({ totalPlaytime: newTotal });
+        playtimeRef.current = newTotal;
+      }
+    };
+  }, [gameStarted, isPaused, user?.uid, updateProfile]);
 
   // Listen for Esc key to exit fullscreen overlay; P to pause/resume
   useEffect(() => {

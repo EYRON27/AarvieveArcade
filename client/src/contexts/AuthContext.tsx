@@ -105,6 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${firebaseUser.displayName || 'Player'}&backgroundColor=b6e3f4`,
               streak: 1,
               totalPoints: 10,
+              totalPlaytime: 0,
               createdAt: new Date().toISOString(),
               unlockedAchievements: ['welcome'],
               achievementDates: {
@@ -168,6 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${name}&backgroundColor=b6e3f4`,
       streak: 1,
       totalPoints: 10,
+      totalPlaytime: 0,
       createdAt: new Date().toISOString(),
       unlockedAchievements: ['welcome'],
       achievementDates: {

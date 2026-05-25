@@ -8,6 +8,7 @@ const DEFAULT_USER: UserProfile = {
   avatarUrl: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=Aarvieve&backgroundColor=111111',
   streak: 3,
   totalPoints: 0,
+  totalPlaytime: 0,
   joinedDate: new Date().toISOString(),
   createdAt: new Date(Date.now() - 7 * 86400000).toISOString()
 };

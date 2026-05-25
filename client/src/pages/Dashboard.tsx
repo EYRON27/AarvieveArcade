@@ -11,7 +11,8 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const { achievements, gallery, scores, fetchInitialData } = useGameStore();
 
-  const [sessionTime, setSessionTime] = useState({ days: 0, hours: 0, mins: 0 });
+  const [memberSince, setMemberSince] = useState({ days: 0, hours: 0, mins: 0 });
+  const [playtime, setPlaytime] = useState({ days: 0, hours: 0, mins: 0 });
   const [greeting, setGreeting] = useState('');
 
   useEffect(() => {
@@ -25,7 +26,7 @@ const Dashboard: React.FC = () => {
     else              setGreeting('Good evening');
   }, []);
 
-  // "Member since" counter
+  // Account age counter
   useEffect(() => {
     const calc = () => {
       const since = new Date(user?.createdAt || Date.now());
@@ -34,12 +35,21 @@ const Dashboard: React.FC = () => {
       const mins  = Math.floor(secs / 60);
       const hrs   = Math.floor(mins / 60);
       const days  = Math.floor(hrs / 24);
-      setSessionTime({ days, hours: hrs % 24, mins: mins % 60 });
+      setMemberSince({ days, hours: hrs % 24, mins: mins % 60 });
     };
     calc();
     const t = setInterval(calc, 60000);
     return () => clearInterval(t);
   }, [user]);
+
+  // Playtime counter
+  useEffect(() => {
+    const secs = user?.totalPlaytime || 0;
+    const mins = Math.floor(secs / 60);
+    const hrs = Math.floor(mins / 60);
+    const days = Math.floor(hrs / 24);
+    setPlaytime({ days, hours: hrs % 24, mins: mins % 60 });
+  }, [user?.totalPlaytime]);
 
   if (!user) return null;
 
@@ -72,13 +82,13 @@ const Dashboard: React.FC = () => {
         <DashboardHeader 
           greeting={greeting}
           userDisplayName={user.displayName}
-          sessionTime={sessionTime}
+          sessionTime={memberSince}
           totalPoints={user.totalPoints}
           unlockedAch={unlockedAch}
           unlockedGal={unlockedGal}
         />
 
-        <MemberSinceCounter sessionTime={sessionTime} />
+        <MemberSinceCounter sessionTime={playtime} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <QuickPlayGrid featuredGames={featuredGames} />
