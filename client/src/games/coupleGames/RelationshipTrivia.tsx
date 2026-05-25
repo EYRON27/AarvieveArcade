@@ -7,60 +7,21 @@ interface ArcadeTriviaProps {
   isPaused?: boolean;
 }
 
-interface Question {
-  id: number;
-  question: string;
-  options: string[];
-  answerIdx: number;
-  hint: string;
-}
-
-const TRIVIA_QUESTIONS: Question[] = [
-  {
-    id: 1,
-    question: 'What year was the iconic game "Pac-Man" first released in arcades?',
-    options: ['1978', '1980', '1982', '1985'],
-    answerIdx: 1,
-    hint: 'It was the beginning of a new decade.'
-  },
-  {
-    id: 2,
-    question: 'In the classic game Snake, what happens when the snake eats food?',
-    options: ['It speeds up only', 'It grows longer', 'The level restarts', 'It earns points only'],
-    answerIdx: 1,
-    hint: 'The challenge is managing your increasing size.'
-  },
-  {
-    id: 3,
-    question: 'Which console introduced the iconic D-pad (directional pad) to gaming?',
-    options: ['Atari 2600', 'Sega Genesis', 'Nintendo Game & Watch', 'PlayStation'],
-    answerIdx: 2,
-    hint: 'It was a handheld device by a famous Japanese company.'
-  },
-  {
-    id: 4,
-    question: 'In Tic-Tac-Toe, how many possible winning lines are there on a 3×3 grid?',
-    options: ['6', '8', '9', '12'],
-    answerIdx: 1,
-    hint: 'Count rows, columns, and diagonals.'
-  },
-  {
-    id: 5,
-    question: 'What is the term for the fastest possible reaction time a trained human can achieve?',
-    options: ['~100 ms', '~200 ms', '~300 ms', '~400 ms'],
-    answerIdx: 1,
-    hint: 'Elite athletes can get close to this threshold.'
-  }
-];
+import { TRIVIA_QUESTIONS, type Question } from './TriviaQuestions';
 
 const ArcadeTrivia: React.FC<ArcadeTriviaProps> = ({ onComplete, onStart, isPaused = false }) => {
   const [gameState, setGameState]   = useState<'idle' | 'playing' | 'gameover'>('idle');
+  const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [score, setScore]           = useState(0);
   const [selectedOpt, setSelected]  = useState<number | null>(null);
   const [isLocked, setIsLocked]     = useState(false);
 
   const startQuiz = () => {
+    // Pick 5 random questions from the 100 question pool
+    const shuffled = [...TRIVIA_QUESTIONS].sort(() => 0.5 - Math.random());
+    setSessionQuestions(shuffled.slice(0, 5));
+
     setCurrentIdx(0); setScore(0); setSelected(null); setIsLocked(false);
     setGameState('playing');
     onStart?.();
@@ -69,11 +30,11 @@ const ArcadeTrivia: React.FC<ArcadeTriviaProps> = ({ onComplete, onStart, isPaus
   const handleOption = (idx: number) => {
     if (isLocked || isPaused) return;
     setSelected(idx); setIsLocked(true);
-    const q = TRIVIA_QUESTIONS[currentIdx];
+    const q = sessionQuestions[currentIdx];
     let next = score;
     if (idx === q.answerIdx) { next += 20; setScore(next); }
     setTimeout(() => {
-      if (currentIdx + 1 < TRIVIA_QUESTIONS.length) {
+      if (currentIdx + 1 < sessionQuestions.length) {
         setCurrentIdx(p => p + 1); setSelected(null); setIsLocked(false);
       } else {
         setGameState('gameover'); onComplete(next);
@@ -81,7 +42,7 @@ const ArcadeTrivia: React.FC<ArcadeTriviaProps> = ({ onComplete, onStart, isPaus
     }, 1400);
   };
 
-  const q = TRIVIA_QUESTIONS[currentIdx];
+  const q = sessionQuestions[currentIdx];
 
   return (
     <div className="w-full max-w-md flex flex-col items-center select-none py-4 px-3">
@@ -117,7 +78,7 @@ const ArcadeTrivia: React.FC<ArcadeTriviaProps> = ({ onComplete, onStart, isPaus
               />
             </div>
             <span className="pixel-text text-slate-500 text-[10px] shrink-0">
-              {currentIdx + 1}/{TRIVIA_QUESTIONS.length}
+              {currentIdx + 1}/{sessionQuestions.length}
             </span>
             <span className="pixel-text text-arcade-green font-bold text-[10px] shrink-0">{score} pts</span>
           </div>
