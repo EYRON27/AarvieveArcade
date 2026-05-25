@@ -38,7 +38,7 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
   const BRICK_PADDING = 10;
   const BRICK_OFFSET_TOP = 40;
   const BRICK_OFFSET_LEFT = 15;
-  
+
   const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
 
   const initBricks = () => {
@@ -113,7 +113,7 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (gameState !== 'playing' || !canvasRef.current) return;
-    
+
     // Support dragging via touch or mouse
     if (e.buttons !== 1 && e.pointerType !== 'touch') return; // Only move if touching or clicking
 
@@ -121,9 +121,9 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
     // Use scaling ratio in case canvas CSS size differs from actual internal coordinate size
     const scaleX = canvasRef.current.width / rect.width;
     const x = (e.clientX - rect.left) * scaleX;
-    
+
     const state = physicsRef.current;
-    
+
     // Center the paddle under the finger/cursor
     let newX = x - state.paddleWidth / 2;
     if (newX < 0) newX = 0;
@@ -162,22 +162,22 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
         if (state.ballX + state.ballDX > canvas.width - state.ballRadius || state.ballX + state.ballDX < state.ballRadius) {
           state.ballDX = -state.ballDX;
         }
-        
+
         // Wall collision (top)
         if (state.ballY + state.ballDY < state.ballRadius) {
           state.ballDY = -state.ballDY;
-        } 
+        }
         // Bottom (Paddle or Game Over)
         else if (state.ballY + state.ballDY > canvas.height - state.ballRadius) {
           // Check if hitting paddle
           if (state.ballX > state.paddleX && state.ballX < state.paddleX + state.paddleWidth) {
             state.ballDY = -state.ballDY;
             // Add some english (spin) based on where it hit the paddle
-            const hitPoint = (state.ballX - (state.paddleX + state.paddleWidth/2)) / (state.paddleWidth/2);
+            const hitPoint = (state.ballX - (state.paddleX + state.paddleWidth / 2)) / (state.paddleWidth / 2);
             state.ballDX = hitPoint * 4;
             // Slight speedup
             if (Math.abs(state.ballDY) < 7) {
-               state.ballDY *= 1.05;
+              state.ballDY *= 1.05;
             }
           } else {
             // Game Over
@@ -194,9 +194,9 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
             activeBricks++;
             // Basic AABB collision
             if (
-              state.ballX > b.x && 
-              state.ballX < b.x + b.width && 
-              state.ballY > b.y && 
+              state.ballX > b.x &&
+              state.ballX < b.x + b.width &&
+              state.ballY > b.y &&
               state.ballY < b.y + b.height
             ) {
               state.ballDY = -state.ballDY;
@@ -221,11 +221,11 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
           ctx.rect(b.x, b.y, b.width, b.height);
           ctx.fillStyle = b.color;
           ctx.fill();
-          
+
           // Glossy highlight
           ctx.fillStyle = 'rgba(255,255,255,0.2)';
           ctx.fillRect(b.x, b.y, b.width, b.height / 3);
-          
+
           ctx.strokeStyle = 'rgba(0,0,0,0.3)';
           ctx.strokeRect(b.x, b.y, b.width, b.height);
           ctx.closePath();
@@ -262,7 +262,7 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
 
   return (
     <div ref={containerRef} className="w-full flex flex-col items-center select-none py-4">
-      
+
       {/* HUD Header */}
       <div className="w-full max-w-sm flex justify-between items-center mb-4 px-4">
         <h2 className="pixel-text text-arcade-blue neon-text-blue tracking-widest text-sm uppercase">
@@ -275,9 +275,9 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
       </div>
 
       <div className="relative border-4 border-slate-800 rounded-3xl overflow-hidden bg-slate-900 shadow-2xl">
-        <canvas 
-          ref={canvasRef} 
-          className="block touch-none cursor-ew-resize" 
+        <canvas
+          ref={canvasRef}
+          className="block touch-none cursor-ew-resize"
           onPointerMove={handlePointerMove}
           onPointerDown={handlePointerMove}
         />
