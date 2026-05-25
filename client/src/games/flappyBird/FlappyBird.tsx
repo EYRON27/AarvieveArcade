@@ -255,8 +255,8 @@ const FlappyBird: React.FC<FlappyBirdProps> = ({ onComplete, onStart, isPaused =
         <canvas ref={canvasRef} onClick={triggerJump} className="block cursor-pointer" />
 
         {/* HUD overlay */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 font-pixel tracking-widest text-slate-100 bg-slate-950/80 border border-slate-800 rounded-2xl px-4 py-2 text-center text-lg z-20">
-          {score}
+        <div className="absolute top-4 right-4 font-pixel tracking-widest text-slate-100 bg-slate-950/60 backdrop-blur-sm border border-slate-800 rounded-2xl px-3 py-1.5 text-right text-sm z-20">
+          Score: <span className="text-arcade-green">{score}</span>
         </div>
 
         {/* Idle/Welcome screen */}
