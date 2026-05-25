@@ -95,11 +95,9 @@ const AuthPage: React.FC = () => {
 
   const handleToggle = (toLogin: boolean) => {
     setError('');
-    setIsLogin(toLogin);
     setPassword('');
     setConfirmPassword('');
-    // Optional: update URL without navigating
-    window.history.pushState(null, '', toLogin ? '/login' : '/register');
+    navigate(toLogin ? '/login' : '/register');
   };
 
   if (loading) {
@@ -163,9 +161,9 @@ const AuthPage: React.FC = () => {
           {error && (
             <motion.div
               key="error"
-              initial={{ opacity: 0, height: 0, mb: 0 }}
-              animate={{ opacity: 1, height: 'auto', mb: 16 }}
-              exit={{ opacity: 0, height: 0, mb: 0 }}
+              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+              animate={{ opacity: 1, height: 'auto', marginBottom: 16 }}
+              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
               className="overflow-hidden"
             >
               <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-xs font-semibold">

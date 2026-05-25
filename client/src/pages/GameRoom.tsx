@@ -282,8 +282,8 @@ const GameRoom: React.FC = () => {
                 <button
                   onClick={() => setIsPaused(p => !p)}
                   className={`absolute top-4 right-16 z-50 p-2.5 backdrop-blur-sm border rounded-xl transition-all shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 ${isPaused
-                      ? 'bg-arcade-green/20 hover:bg-arcade-green text-arcade-green hover:text-white border-arcade-green/50'
-                      : 'bg-slate-900/90 hover:bg-amber-500 text-slate-300 hover:text-white border-slate-700/50'
+                    ? 'bg-arcade-green/20 hover:bg-arcade-green text-arcade-green hover:text-white border-arcade-green/50'
+                    : 'bg-slate-900/90 hover:bg-amber-500 text-slate-300 hover:text-white border-slate-700/50'
                     }`}
                   title={isPaused ? 'Resume (P)' : 'Pause (P)'}
                 >

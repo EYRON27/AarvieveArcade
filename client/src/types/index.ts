@@ -10,6 +10,7 @@ export interface UserProfile {
   joinedDate?: string;
   unlockedAchievements?: string[];
   achievementDates?: Record<string, string>;
+  totalPlaytime?: number;
 }
 
 export interface GameScore {

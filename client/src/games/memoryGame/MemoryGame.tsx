@@ -62,7 +62,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
     const firstCard = cards[firstIdx];
     const secondCard = cards[secondIdx];
 
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: ReturnType<typeof setTimeout>;
 
     if (firstCard.symbol === secondCard.symbol) {
       // It's a match!
@@ -152,27 +152,41 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
                 <div
                   key={card.id}
                   onClick={() => handleCardClick(idx)}
-                  className="relative flex items-center justify-center aspect-square cursor-pointer preserve-3d"
+                  className="relative w-full aspect-square cursor-pointer preserve-3d"
+                  style={{ perspective: '1000px' }}
                 >
                   <motion.div
                     animate={{ rotateY: showSymbol ? 180 : 0 }}
-                    transition={{ duration: 0.35 }}
-                    className="absolute inset-0 w-full h-full rounded-2xl flex items-center justify-center text-3xl font-bold backface-hidden"
-                    style={{
-                      backgroundColor: showSymbol ? '#0d0a1e' : '#1e1b4b',
-                      border: showSymbol ? '2px solid rgba(253, 230, 138, 0.4)' : '2px solid rgba(253, 230, 138, 0.15)',
-                    }}
+                    transition={{ duration: 0.35, ease: "easeInOut" }}
+                    className="relative w-full h-full rounded-2xl preserve-3d shadow-lg"
+                    style={{ transformStyle: 'preserve-3d' }}
                   >
-                    {!showSymbol ? (
-                      <span className="text-xl text-arcade-green/60">❓</span>
-                    ) : (
-                      <span
-                        className="rotate-y-180 block"
-                        style={{ transform: 'rotateY(180deg)' }}
-                      >
-                        {card.symbol}
-                      </span>
-                    )}
+                    {/* Front of card (Question Mark) */}
+                    <div 
+                      className="absolute inset-0 w-full h-full rounded-2xl flex items-center justify-center backface-hidden"
+                      style={{
+                        backgroundColor: '#1e1b4b',
+                        border: '2px solid rgba(253, 230, 138, 0.15)',
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden'
+                      }}
+                    >
+                      <span className="text-3xl text-arcade-green/60">❓</span>
+                    </div>
+
+                    {/* Back of card (Symbol) */}
+                    <div 
+                      className="absolute inset-0 w-full h-full rounded-2xl flex items-center justify-center backface-hidden"
+                      style={{
+                        backgroundColor: '#0d0a1e',
+                        border: '2px solid rgba(253, 230, 138, 0.5)',
+                        transform: 'rotateY(180deg)',
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden'
+                      }}
+                    >
+                      <span className="text-4xl">{card.symbol}</span>
+                    </div>
                   </motion.div>
                 </div>
               );
