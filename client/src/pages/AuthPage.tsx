@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,15 +11,12 @@ const AuthPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const [isLogin, setIsLogin] = useState(location.pathname !== '/register');
-
-  useEffect(() => {
-    setIsLogin(location.pathname !== '/register');
-  }, [location.pathname]);
+  const isLogin = location.pathname !== '/register';
 
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail]             = useState('');
   const [password, setPassword]       = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError]             = useState('');
   const [loading, setLoading]         = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -34,10 +31,11 @@ const AuthPage: React.FC = () => {
         setLoading(true);
         await login(email, password);
         navigate('/dashboard');
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const firebaseErr = err as { code?: string; message?: string };
         let errorMessage = 'Sign in failed. Check your credentials.';
-        if (err.code) {
-          switch (err.code) {
+        if (firebaseErr.code) {
+          switch (firebaseErr.code) {
             case 'auth/invalid-credential':
             case 'auth/user-not-found':
             case 'auth/wrong-password':
@@ -52,23 +50,25 @@ const AuthPage: React.FC = () => {
             default:
               errorMessage = 'Authentication failed. Please try again.';
           }
-        } else if (err.message && !err.message.includes('Firebase')) {
-          errorMessage = err.message;
+        } else if (firebaseErr.message && !firebaseErr.message.includes('Firebase')) {
+          errorMessage = firebaseErr.message;
         }
         setError(errorMessage);
         setLoading(false);
       }
     } else {
-      if (!email || !password || !displayName) return setError('Please fill in all fields.');
+      if (!email || !password || !displayName || !confirmPassword) return setError('Please fill in all fields.');
+      if (password !== confirmPassword) return setError('Passwords do not match.');
       try {
         setLoading(true);
         await new Promise(r => setTimeout(r, 1500)); // Artificial delay for effect
         await register(email, password, displayName);
         navigate('/dashboard');
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const firebaseErr = err as { code?: string; message?: string };
         let errorMessage = 'Account creation failed. Email may already be in use.';
-        if (err.code) {
-          switch (err.code) {
+        if (firebaseErr.code) {
+          switch (firebaseErr.code) {
             case 'auth/email-already-in-use':
               errorMessage = 'An account with this email already exists.';
               break;
@@ -84,8 +84,8 @@ const AuthPage: React.FC = () => {
             default:
               errorMessage = 'Registration failed. Please try again.';
           }
-        } else if (err.message && !err.message.includes('Firebase')) {
-          errorMessage = err.message;
+        } else if (firebaseErr.message && !firebaseErr.message.includes('Firebase')) {
+          errorMessage = firebaseErr.message;
         }
         setError(errorMessage);
         setLoading(false);
@@ -95,9 +95,9 @@ const AuthPage: React.FC = () => {
 
   const handleToggle = (toLogin: boolean) => {
     setError('');
-    setIsLogin(toLogin);
-    // Optional: update URL without navigating
-    window.history.pushState(null, '', toLogin ? '/login' : '/register');
+    setPassword('');
+    setConfirmPassword('');
+    navigate(toLogin ? '/login' : '/register');
   };
 
   if (loading) {
@@ -105,14 +105,14 @@ const AuthPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-arcade-darker px-4 py-8">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-arcade-darker px-4 py-8 overflow-y-auto">
       {/* Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:40px_40px] pointer-events-none" />
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:40px_40px] pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 w-full max-w-sm"
+        className="relative z-10 w-full max-w-sm my-auto shrink-0"
       >
         {/* Header */}
         <div className="text-center mb-6">
@@ -161,9 +161,9 @@ const AuthPage: React.FC = () => {
           {error && (
             <motion.div
               key="error"
-              initial={{ opacity: 0, height: 0, mb: 0 }}
-              animate={{ opacity: 1, height: 'auto', mb: 16 }}
-              exit={{ opacity: 0, height: 0, mb: 0 }}
+              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+              animate={{ opacity: 1, height: 'auto', marginBottom: 16 }}
+              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
               className="overflow-hidden"
             >
               <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-xs font-semibold">
@@ -228,6 +228,29 @@ const AuthPage: React.FC = () => {
               </button>
             </div>
           </div>
+
+          <AnimatePresence mode="popLayout" initial={false}>
+            {!isLogin && (
+              <motion.div
+                key="confirmPasswordField"
+                initial={{ opacity: 0, y: -10, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: 'auto' }}
+                exit={{ opacity: 0, y: -10, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col gap-1 overflow-hidden"
+              >
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">Confirm Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                  <input
+                    type={showPassword ? "text" : "password"} placeholder="Confirm your password" value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)} disabled={loading}
+                    className="w-full bg-arcade-dark border border-white/8 hover:border-white/15 focus:border-arcade-blue/50 focus:outline-none rounded-lg py-3 pl-10 pr-10 text-slate-200 text-sm transition-all"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <button
             type="submit" disabled={loading}

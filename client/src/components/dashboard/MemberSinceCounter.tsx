@@ -16,7 +16,7 @@ const MemberSinceCounter: React.FC<MemberSinceCounterProps> = ({ sessionTime }) 
     >
       <div className="flex items-center gap-2 mb-4">
         <TrendingUp className="w-4 h-4 text-arcade-green" />
-        <span className="pixel-text text-slate-500 text-[10px] uppercase tracking-widest">Playing Since Day 1</span>
+        <span className="pixel-text text-slate-500 text-[10px] uppercase tracking-widest">Total Playtime</span>
       </div>
       <div className="grid grid-cols-3 gap-3">
         {[

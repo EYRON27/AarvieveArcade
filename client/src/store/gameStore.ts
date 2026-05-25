@@ -28,9 +28,22 @@ const ALL_ACHIEVEMENTS: Achievement[] = [
 ];
 
 const ALL_GALLERY: GalleryItem[] = [
-  { id: 'pixel_city',  title: 'Pixel City 🌆',   description: 'A vibrant neon pixel-art cityscape.', imageUrl: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?q=80&w=600&auto=format&fit=crop', unlockCondition: 'Unlock: Score 15+ in Flappy Bird.', isUnlocked: false },
-  { id: 'retro_lab',   title: 'Retro Lab 🕹️',    description: 'The secret back room of Aarvieve games.', imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop', unlockCondition: 'Unlock: Beat the AI in Tic-Tac-Toe.', isUnlocked: false },
-  { id: 'hall_of_fame', title: 'Hall of Fame 🏆', description: 'The legendary leaderboard hall.', imageUrl: 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?q=80&w=600&auto=format&fit=crop', unlockCondition: 'Unlock: Score 100+ in Snake or earn 5+ achievements.', isUnlocked: false },
+  { id: 'welcome',         title: 'Welcome to the Arcade 🎮', description: 'Create your account and enter Aarvieve Arcade.', imageUrl: '/gallery/gallery_welcome_1779587115532.png', unlockCondition: 'Unlock: Create your account.', isUnlocked: false },
+  { id: 'flappy_pro',      title: 'Flappy Pro 🐦',            description: 'A retro pixel art yellow bird flying between green pipes.', imageUrl: '/gallery/gallery_flappy_1779587132831.png', unlockCondition: 'Unlock: Score 15+ points in Flappy Bird.', isUnlocked: false },
+  { id: 'snake_century',   title: 'Snake Century 🐍',         description: 'A retro green snake eating a glowing apple on a dark grid.', imageUrl: '/gallery/gallery_snake_1779587147646.png', unlockCondition: 'Unlock: Reach a score of 100 in Snake.', isUnlocked: false },
+  { id: 'tic_winner',      title: 'Strategy Master ❌',       description: 'A neon glowing tic-tac-toe board with hearts and stars.', imageUrl: '/gallery/gallery_tictactoe_1779587162132.png', unlockCondition: 'Unlock: Beat the AI in Tic-Tac-Toe.', isUnlocked: false },
+  { id: 'memory_speed',    title: 'Photographic Memory 🧠',   description: 'A set of glowing memory cards with cute pixel art icons.', imageUrl: '/gallery/gallery_memory_1779587176196.png', unlockCondition: 'Unlock: Match all cards in under 30 seconds.', isUnlocked: false },
+  { id: 'puzzle_master',   title: 'Puzzle Master 🧩',         description: 'A glowing 2048 puzzle grid with colorful neon tiles.', imageUrl: '/gallery/gallery_2048_1779587190296.png', unlockCondition: 'Unlock: Merge tiles to reach the 2048 tile.', isUnlocked: false },
+  { id: 'sudoku_master',   title: 'Sudoku Master 🔢',         description: 'A neon-lit Sudoku board with glowing blue numbers.', imageUrl: '/gallery/gallery_sudoku_1779587203205.png', unlockCondition: 'Unlock: Solve a Sudoku puzzle.', isUnlocked: false },
+  { id: 'neon_god',        title: 'Neon God 👁️',             description: 'A sequence of four glowing neon pads in retro 80s style.', imageUrl: '/gallery/gallery_neon_1779587221099.png', unlockCondition: 'Unlock: Reach a sequence of 10 in Neon Sequence.', isUnlocked: false },
+  { id: 'space_survivor',  title: 'Space Survivor 🚀',        description: 'A pixel art spaceship dodging asteroids in deep space.', imageUrl: '/gallery/gallery_space_1779587244093.png', unlockCondition: 'Unlock: Survive an asteroid field and score 50 points.', isUnlocked: false },
+  { id: 'brick_smasher',   title: 'Demolition Expert 🧱',     description: 'A glowing blue paddle smashing colorful neon bricks.', imageUrl: '/gallery/gallery_brick_1779587259139.png', unlockCondition: 'Unlock: Clear all the bricks to win the game.', isUnlocked: false },
+  { id: 'bug_squasher',    title: 'Bug Squasher 🐛',          description: 'A frantic whack-a-mole style game with cartoon bugs.', imageUrl: '/gallery/gallery_bug_1779587275028.png', unlockCondition: 'Unlock: Whack 30 bugs in 30 seconds.', isUnlocked: false },
+  { id: 'lightning',       title: 'Lightning Reflex ⚡',      description: 'A striking neon lightning bolt symbolizing fast reflexes.', imageUrl: '/gallery/gallery_lightning_1779587291181.png', unlockCondition: 'Unlock: Get a reaction time under 250ms.', isUnlocked: false },
+  { id: 'heart_hunter',    title: 'Heart Hunter 🧺',          description: 'A pixel art basket catching falling glowing pink hearts.', imageUrl: '/gallery/gallery_heart_1779587303712.png', unlockCondition: 'Unlock: Catch 50 hearts in Catch My Heart.', isUnlocked: false },
+  { id: 'trivia_master',   title: 'Trivia Master 👑',         description: 'A retro game show buzzer and trivia screen.', imageUrl: '/gallery/gallery_trivia_1779587318765.png', unlockCondition: 'Unlock: Score 100/100 in Arcade Trivia.', isUnlocked: false },
+  { id: 'perfectionist',   title: 'Perfectionist 🏅',         description: 'Three golden arcade medals glowing on a pedestal.', imageUrl: '/gallery/gallery_perfectionist_1779587335652.png', unlockCondition: 'Unlock: Achieve a personal best in any 3 different games.', isUnlocked: false },
+  { id: 'high_roller',     title: 'High Roller 🎰',           description: 'A retro arcade slot machine hitting a jackpot.', imageUrl: '/gallery/gallery_highroller_1779587350225.png', unlockCondition: 'Unlock: Accumulate 200 total points across all games.', isUnlocked: false },
 ];
 
 const ALL_GAME_IDS = ['flappyBird', 'snake', 'ticTacToe', 'memoryGame', 'puzzle2048', 'sudoku', 'neonSequence', 'spaceDodger', 'brickBreaker', 'whackABug', 'reactionGame', 'catchMyHeart', 'relationshipTrivia'];
@@ -120,7 +133,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
           gId,
           scores: snap.docs
             .map(d => ({ id: d.id, ...d.data() } as GameScore))
-            .sort((a, b) => gId === 'reactionGame' ? a.score - b.score : b.score - a.score)
+            .sort((a, b) => (gId === 'reactionGame' || gId === 'memoryGame') ? a.score - b.score : b.score - a.score)
             .slice(0, 10) // top 10 client-side
         }))
       );
@@ -165,7 +178,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       // Update local scores immediately (no need to refetch)
       const updatedScores = { ...get().scores };
       const list = [...(updatedScores[gameId] || []), { id: ref.id, ...data }]
-        .sort((a, b) => gameId === 'reactionGame' ? a.score - b.score : b.score - a.score)
+        .sort((a, b) => (gameId === 'reactionGame' || gameId === 'memoryGame') ? a.score - b.score : b.score - a.score)
         .slice(0, 10);
       updatedScores[gameId] = list;
       set({ scores: updatedScores });
@@ -234,10 +247,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       // Update gallery based on new achievements
       const unlockedIds = updated.filter(a => a.isUnlocked).map(a => a.id);
       const updatedGallery = get().gallery.map(g => {
-        const unlocked =
-          (g.id === 'pixel_city'   && unlockedIds.includes('flappy_pro'))   ||
-          (g.id === 'retro_lab'    && unlockedIds.includes('tic_winner'))    ||
-          (g.id === 'hall_of_fame' && (unlockedIds.includes('snake_century') || unlockedIds.length >= 5));
+        const unlocked = unlockedIds.includes(g.id);
         return { ...g, isUnlocked: g.isUnlocked || unlocked };
       });
 

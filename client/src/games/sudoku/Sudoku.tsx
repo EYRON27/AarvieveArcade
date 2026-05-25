@@ -15,108 +15,100 @@ type Cell = {
 
 type Board = Cell[][];
 
+// --- SUDOKU LOGIC ---
+const isSafeBox = (b: number[][], rowStart: number, colStart: number, num: number) => {
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (b[rowStart + i][colStart + j] === num) return false;
+    }
+  }
+  return true;
+};
+
+const isSafe = (b: number[][], r: number, c: number, num: number) => {
+  for (let i = 0; i < 9; i++) {
+    if (b[r][i] === num || b[i][c] === num) return false;
+  }
+  const startRow = r - r % 3;
+  const startCol = c - c % 3;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (b[startRow + i][startCol + j] === num) return false;
+    }
+  }
+  return true;
+};
+
+const fillBox = (b: number[][], rowStart: number, colStart: number) => {
+  let num;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      do {
+        num = Math.floor(Math.random() * 9) + 1;
+      } while (!isSafeBox(b, rowStart, colStart, num));
+      b[rowStart + i][colStart + j] = num;
+    }
+  }
+};
+
+const fillRemaining = (b: number[][], r: number, c: number): boolean => {
+  if (c >= 9 && r < 8) {
+    r = r + 1;
+    c = 0;
+  }
+  if (r >= 9 && c >= 9) return true;
+  if (r < 3) {
+    if (c < 3) c = 3;
+  } else if (r < 6) {
+    if (c === (Math.floor(r / 3) * 3)) c += 3;
+  } else {
+    if (c === 6) {
+      r = r + 1;
+      c = 0;
+      if (r >= 9) return true;
+    }
+  }
+
+  for (let num = 1; num <= 9; num++) {
+    if (isSafe(b, r, c, num)) {
+      b[r][c] = num;
+      if (fillRemaining(b, r, c + 1)) return true;
+      b[r][c] = 0;
+    }
+  }
+  return false;
+};
+
+const digHoles = (b: number[][], count: number) => {
+  while (count > 0) {
+    const cellId = Math.floor(Math.random() * 81);
+    const r = Math.floor(cellId / 9);
+    const c = cellId % 9;
+    if (b[r][c] !== 0) {
+      b[r][c] = 0;
+      count--;
+    }
+  }
+};
+
+const generateSudoku = () => {
+  const newBoard = Array(9).fill(null).map(() => Array(9).fill(0));
+  for (let i = 0; i < 9; i += 3) fillBox(newBoard, i, i);
+  fillRemaining(newBoard, 0, 3);
+  digHoles(newBoard, 40);
+
+  const initialBoard: Board = newBoard.map(row => 
+    row.map(val => ({ value: val, isInitial: val !== 0 }))
+  );
+  return initialBoard;
+};
+
 const Sudoku: React.FC<SudokuProps> = ({ onComplete, onStart, isPaused = false }) => {
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'won'>('idle');
   const [board, setBoard] = useState<Board>([]);
   const [selectedCell, setSelectedCell] = useState<{ r: number; c: number } | null>(null);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
-
-  // --- SUDOKU LOGIC ---
-  const generateSudoku = useCallback(() => {
-    const newBoard = Array(9).fill(null).map(() => Array(9).fill(0));
-    
-    // Fill diagonal 3x3 boxes (independent)
-    for (let i = 0; i < 9; i += 3) {
-      fillBox(newBoard, i, i);
-    }
-    
-    // Fill remaining
-    fillRemaining(newBoard, 0, 3);
-    
-    // Dig holes (Difficulty: easy/medium ~ 40 holes)
-    digHoles(newBoard, 40);
-
-    const initialBoard: Board = newBoard.map(row => 
-      row.map(val => ({ value: val, isInitial: val !== 0 }))
-    );
-    return initialBoard;
-  }, []);
-
-  const fillBox = (b: number[][], rowStart: number, colStart: number) => {
-    let num;
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        do {
-          num = Math.floor(Math.random() * 9) + 1;
-        } while (!isSafeBox(b, rowStart, colStart, num));
-        b[rowStart + i][colStart + j] = num;
-      }
-    }
-  };
-
-  const isSafeBox = (b: number[][], rowStart: number, colStart: number, num: number) => {
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        if (b[rowStart + i][colStart + j] === num) return false;
-      }
-    }
-    return true;
-  };
-
-  const isSafe = (b: number[][], r: number, c: number, num: number) => {
-    for (let i = 0; i < 9; i++) {
-      if (b[r][i] === num || b[i][c] === num) return false;
-    }
-    const startRow = r - r % 3;
-    const startCol = c - c % 3;
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        if (b[startRow + i][startCol + j] === num) return false;
-      }
-    }
-    return true;
-  };
-
-  const fillRemaining = (b: number[][], r: number, c: number): boolean => {
-    if (c >= 9 && r < 8) {
-      r = r + 1;
-      c = 0;
-    }
-    if (r >= 9 && c >= 9) return true;
-    if (r < 3) {
-      if (c < 3) c = 3;
-    } else if (r < 6) {
-      if (c === (Math.floor(r / 3) * 3)) c += 3;
-    } else {
-      if (c === 6) {
-        r = r + 1;
-        c = 0;
-        if (r >= 9) return true;
-      }
-    }
-
-    for (let num = 1; num <= 9; num++) {
-      if (isSafe(b, r, c, num)) {
-        b[r][c] = num;
-        if (fillRemaining(b, r, c + 1)) return true;
-        b[r][c] = 0;
-      }
-    }
-    return false;
-  };
-
-  const digHoles = (b: number[][], count: number) => {
-    while (count > 0) {
-      let cellId = Math.floor(Math.random() * 81);
-      let r = Math.floor(cellId / 9);
-      let c = cellId % 9;
-      if (b[r][c] !== 0) {
-        b[r][c] = 0;
-        count--;
-      }
-    }
-  };
 
   // --- GAMEPLAY ---
   const startGame = () => {
@@ -135,22 +127,7 @@ const Sudoku: React.FC<SudokuProps> = ({ onComplete, onStart, isPaused = false }
     return () => clearInterval(interval);
   }, [gameState, isPaused]);
 
-  const handleInput = useCallback((num: number) => {
-    if (gameState !== 'playing' || !selectedCell || isPaused) return;
-    const { r, c } = selectedCell;
-    if (board[r][c].isInitial) return;
-
-    setBoard(prev => {
-      const newBoard = prev.map(row => [...row]);
-      newBoard[r][c] = { ...newBoard[r][c], value: num };
-      return newBoard;
-    });
-
-    // Check win condition slightly after state updates
-    setTimeout(() => checkWin(board), 0);
-  }, [gameState, selectedCell, board]);
-
-  const checkWin = (currentBoard: Board) => {
+  const checkWin = useCallback((currentBoard: Board) => {
     // A quick check if board is full and valid
     for (let r = 0; r < 9; r++) {
       for (let c = 0; c < 9; c++) {
@@ -174,7 +151,22 @@ const Sudoku: React.FC<SudokuProps> = ({ onComplete, onStart, isPaused = false }
     const finalScore = Math.max(1000 - time * 2, 100);
     setScore(finalScore);
     onComplete(finalScore);
-  };
+  }, [onComplete, time]);
+
+  const handleInput = useCallback((num: number) => {
+    if (gameState !== 'playing' || !selectedCell || isPaused) return;
+    const { r, c } = selectedCell;
+    if (board[r][c].isInitial) return;
+
+    setBoard(prev => {
+      const newBoard = prev.map(row => [...row]);
+      newBoard[r][c] = { ...newBoard[r][c], value: num };
+      return newBoard;
+    });
+
+    // Check win condition slightly after state updates
+    setTimeout(() => checkWin(board), 0);
+  }, [gameState, selectedCell, board, isPaused, checkWin]);
 
   // Keyboard controls
   useEffect(() => {

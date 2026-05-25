@@ -13,6 +13,7 @@ const ReactionGame: React.FC<ReactionGameProps> = ({ onComplete, onStart, isPaus
   const [stage, setStage] = useState<ReactionState>('idle');
   const [ms, setMs] = useState<number | null>(null);
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const timeoutRef = useRef<any>(null);
   const startTimeRef = useRef<number>(0);
 

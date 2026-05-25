@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -25,7 +25,7 @@ const WhackABug: React.FC<WhackABugProps> = ({ onComplete, onStart, isPaused = f
     onStart?.();
   };
 
-  const spawnBug = () => {
+  const spawnBug = useCallback(function spawn() {
     // 9 holes (0 to 8)
     const newBugId = Math.floor(Math.random() * 9);
     setActiveBugId(newBugId);
@@ -38,9 +38,9 @@ const WhackABug: React.FC<WhackABugProps> = ({ onComplete, onStart, isPaused = f
     bugTimerRef.current = setTimeout(() => {
       setActiveBugId(null);
       // Wait a tiny bit before spawning the next one
-      setTimeout(spawnBug, Math.random() * 300 + 200);
+      setTimeout(spawn, Math.random() * 300 + 200);
     }, timeToDisappear);
-  };
+  }, []);
 
   useEffect(() => {
     if (gameState === 'playing' && !isPaused) {

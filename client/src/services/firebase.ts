@@ -10,14 +10,14 @@ import { getStorage } from 'firebase/storage';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
-  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  databaseURL:       import.meta.env.VITE_FIREBASE_DATABASE_URL,
-  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Check if we should use mock services
@@ -26,9 +26,13 @@ export const isMockFirebase =
   !import.meta.env.VITE_FIREBASE_API_KEY ||
   import.meta.env.VITE_FIREBASE_API_KEY === 'mock-api-key';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let auth: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let db: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let storage: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let analytics: any = null;
 
 if (!isMockFirebase) {
@@ -37,7 +41,7 @@ if (!isMockFirebase) {
 
     // ── Auth: persist token locally so re-auth is instant on reload ──────
     auth = getAuth(app);
-    setPersistence(auth, browserLocalPersistence).catch(() => {});
+    setPersistence(auth, browserLocalPersistence).catch(() => { });
 
     // ── Firestore: enable offline persistent cache for speed ──────────────
     // Documents already fetched are served from disk instantly; only diffs
@@ -49,7 +53,7 @@ if (!isMockFirebase) {
       }),
     });
 
-    storage  = getStorage(app);
+    storage = getStorage(app);
 
     // ── Analytics: only load in browser environments ──────────────────────
     isSupported().then(yes => {

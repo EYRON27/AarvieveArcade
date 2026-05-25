@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   signInWithEmailAndPassword, 
@@ -33,6 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const cachedUser = localStorage.getItem('aa_cached_user');
     if (cachedUser) {
       try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setUser(JSON.parse(cachedUser));
       } catch { /* ignore corrupt cache */ }
       setLoading(false);
@@ -46,6 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const isLoggedIn = localStorage.getItem('aa_user_logged_in');
       if (isLoggedIn) {
         const mockUser = MockStorage.updateProfile({});
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setUser(mockUser);
         localStorage.setItem('aa_cached_user', JSON.stringify(mockUser));
       } else {
@@ -105,7 +108,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${firebaseUser.displayName || 'Player'}&backgroundColor=b6e3f4`,
               streak: 1,
               totalPoints: 10,
-              createdAt: new Date().toISOString()
+              totalPlaytime: 0,
+              createdAt: new Date().toISOString(),
+              unlockedAchievements: ['welcome'],
+              achievementDates: {
+                'welcome': new Date().toISOString()
+              }
             };
             await setDoc(userDocRef, newProfile);
             setUser(newProfile);
@@ -164,7 +172,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${name}&backgroundColor=b6e3f4`,
       streak: 1,
       totalPoints: 10,
-      createdAt: new Date().toISOString()
+      totalPlaytime: 0,
+      createdAt: new Date().toISOString(),
+      unlockedAchievements: ['welcome'],
+      achievementDates: {
+        'welcome': new Date().toISOString()
+      }
     };
     
     await setDoc(doc(db, 'users', userCredential.user.uid), newProfile);
@@ -198,6 +211,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const userDocRef = doc(db, 'users', user.uid);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await updateDoc(userDocRef, data as any);
     setUser(updatedUser);
     localStorage.setItem('aa_cached_user', JSON.stringify(updatedUser));

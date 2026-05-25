@@ -23,6 +23,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
   const [seconds, setSeconds] = useState(0);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const timerRef = useRef<any>(null);
 
   // Initialize cards
@@ -61,18 +62,19 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
     const firstCard = cards[firstIdx];
     const secondCard = cards[secondIdx];
 
+    let timeoutId: ReturnType<typeof setTimeout>;
+
     if (firstCard.symbol === secondCard.symbol) {
       // It's a match!
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setCards(prev => {
           const next = [...prev];
-          next[firstIdx].isMatched = true;
-          next[secondIdx].isMatched = true;
-          
+          next[firstIdx] = { ...next[firstIdx], isMatched: true };
+          next[secondIdx] = { ...next[secondIdx], isMatched: true };
+
           // Check if all matched
           if (next.every(c => c.isMatched)) {
             setGameState('gameover');
-            onComplete(seconds);
           }
           return next;
         });
@@ -80,24 +82,34 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
       }, 500);
     } else {
       // Flip back
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setCards(prev => {
           const next = [...prev];
-          next[firstIdx].isFlipped = false;
-          next[secondIdx].isFlipped = false;
+          next[firstIdx] = { ...next[firstIdx], isFlipped: false };
+          next[secondIdx] = { ...next[secondIdx], isFlipped: false };
           return next;
         });
         setSelectedCards([]);
       }, 800);
     }
-  }, [selectedCards, cards, seconds]);
+
+    return () => clearTimeout(timeoutId);
+  }, [selectedCards, cards]);
+
+  // Trigger onComplete when gameover is reached
+  useEffect(() => {
+    if (gameState === 'gameover') {
+      onComplete(seconds);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState]);
 
   const handleCardClick = (idx: number) => {
     if (isPaused || cards[idx].isFlipped || cards[idx].isMatched || selectedCards.length >= 2 || gameState !== 'playing') return;
 
     setCards(prev => {
       const next = [...prev];
-      next[idx].isFlipped = true;
+      next[idx] = { ...next[idx], isFlipped: true };
       return next;
     });
 
@@ -106,7 +118,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
 
   return (
     <div className="w-full max-w-sm flex flex-col items-center select-none py-4 px-2">
-      
+
       {gameState === 'idle' && (
         <div className="flex flex-col items-center justify-center text-center py-10">
           <span className="text-7xl mb-4 animate-float">🧠</span>
@@ -135,32 +147,46 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
           <div className="grid grid-cols-3 gap-3.5 bg-slate-900/40 border border-slate-800 rounded-3xl p-4.5 w-full aspect-square">
             {cards.map((card, idx) => {
               const showSymbol = card.isFlipped || card.isMatched;
-              
+
               return (
                 <div
                   key={card.id}
                   onClick={() => handleCardClick(idx)}
-                  className="relative flex items-center justify-center aspect-square cursor-pointer preserve-3d"
+                  className="relative w-full aspect-square cursor-pointer preserve-3d"
+                  style={{ perspective: '1000px' }}
                 >
                   <motion.div
                     animate={{ rotateY: showSymbol ? 180 : 0 }}
-                    transition={{ duration: 0.35 }}
-                    className="absolute inset-0 w-full h-full rounded-2xl flex items-center justify-center text-3xl font-bold backface-hidden"
-                    style={{
-                      backgroundColor: showSymbol ? '#0d0a1e' : '#1e1b4b',
-                      border: showSymbol ? '2px solid rgba(253, 230, 138, 0.4)' : '2px solid rgba(253, 230, 138, 0.15)',
-                    }}
+                    transition={{ duration: 0.35, ease: "easeInOut" }}
+                    className="relative w-full h-full rounded-2xl preserve-3d shadow-lg"
+                    style={{ transformStyle: 'preserve-3d' }}
                   >
-                    {!showSymbol ? (
-                      <span className="text-xl text-arcade-green/60">❓</span>
-                    ) : (
-                      <span
-                        className="rotate-y-180 block"
-                        style={{ transform: 'rotateY(180deg)' }}
-                      >
-                        {card.symbol}
-                      </span>
-                    )}
+                    {/* Front of card (Question Mark) */}
+                    <div 
+                      className="absolute inset-0 w-full h-full rounded-2xl flex items-center justify-center backface-hidden"
+                      style={{
+                        backgroundColor: '#1e1b4b',
+                        border: '2px solid rgba(253, 230, 138, 0.15)',
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden'
+                      }}
+                    >
+                      <span className="text-3xl text-arcade-green/60">❓</span>
+                    </div>
+
+                    {/* Back of card (Symbol) */}
+                    <div 
+                      className="absolute inset-0 w-full h-full rounded-2xl flex items-center justify-center backface-hidden"
+                      style={{
+                        backgroundColor: '#0d0a1e',
+                        border: '2px solid rgba(253, 230, 138, 0.5)',
+                        transform: 'rotateY(180deg)',
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden'
+                      }}
+                    >
+                      <span className="text-4xl">{card.symbol}</span>
+                    </div>
                   </motion.div>
                 </div>
               );

@@ -31,6 +31,7 @@ const Navbar: React.FC = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   // PWA Install Prompt State
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   
@@ -66,7 +67,10 @@ const Navbar: React.FC = () => {
     }
   }, [musicEnabled, user, isGameMusicPlaying]);
 
-  useEffect(() => { setMobileMenuOpen(false); }, [location.pathname]);
+  useEffect(() => { 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMobileMenuOpen(false); 
+  }, [location.pathname]);
 
   // Handle PWA Installation
   useEffect(() => {

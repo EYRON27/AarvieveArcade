@@ -27,24 +27,24 @@ const CatchMyHeart = lazy(() => import('../games/catchMyHeart/CatchMyHeart'));
 const RelationshipTrivia = lazy(() => import('../games/coupleGames/RelationshipTrivia'));
 
 const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }> = {
-  flappyBird:         { title: 'Flappy Bird',      desc: 'Navigate through obstacles without crashing.',  icon: '🦅' },
-  snake:              { title: 'Snake',             desc: "Classic neon snake — grow longer, don't crash.", icon: '🐍' },
-  ticTacToe:          { title: 'Tic Tac Toe',       desc: 'Outsmart the AI on the classic 3×3 grid.',      icon: '❌' },
-  memoryGame:         { title: 'Memory Cards',      desc: 'Match all pairs as fast as possible.',          icon: '🧠' },
-  puzzle2048:         { title: '2048 Puzzle',       desc: 'Slide and merge tiles to reach 2048.',          icon: '🧩' },
-  sudoku:             { title: 'Sudoku',            desc: 'The classic 9x9 logic puzzle.',                 icon: '🔢' },
-  neonSequence:       { title: 'Neon Sequence',     desc: 'Memorize the color sequence pattern.',          icon: '👁️' },
-  spaceDodger:        { title: 'Space Dodger',      desc: 'Dodge the falling asteroids to survive!',       icon: '🚀' },
-  brickBreaker:       { title: 'Brick Breaker',     desc: 'Smash all the bricks with the ball.',           icon: '🧱' },
-  whackABug:          { title: 'Whack-A-Bug',       desc: 'Smash as many bugs as you can in 30s.',         icon: '🐛' },
-  reactionGame:       { title: 'Reaction Clicker',  desc: 'Click the target instantly — test your reflex.',icon: '⚡' },
-  catchMyHeart:       { title: 'Catch My Heart',    desc: 'Catch falling hearts with your basket.',        icon: '🧺' },
-  relationshipTrivia: { title: 'Arcade Trivia',     desc: 'Test your gaming knowledge — 5 questions.',     icon: '🎯' }
+  flappyBird: { title: 'Flappy Bird', desc: 'Navigate through obstacles without crashing.', icon: '🦅' },
+  snake: { title: 'Snake', desc: "Classic neon snake — grow longer, don't crash.", icon: '🐍' },
+  ticTacToe: { title: 'Tic Tac Toe', desc: 'Outsmart the AI on the classic 3×3 grid.', icon: '❌' },
+  memoryGame: { title: 'Memory Cards', desc: 'Match all pairs as fast as possible.', icon: '🧠' },
+  puzzle2048: { title: '2048 Puzzle', desc: 'Slide and merge tiles to reach 2048.', icon: '🧩' },
+  sudoku: { title: 'Sudoku', desc: 'The classic 9x9 logic puzzle.', icon: '🔢' },
+  neonSequence: { title: 'Neon Sequence', desc: 'Memorize the color sequence pattern.', icon: '👁️' },
+  spaceDodger: { title: 'Space Dodger', desc: 'Dodge the falling asteroids to survive!', icon: '🚀' },
+  brickBreaker: { title: 'Brick Breaker', desc: 'Smash all the bricks with the ball.', icon: '🧱' },
+  whackABug: { title: 'Whack-A-Bug', desc: 'Smash as many bugs as you can in 30s.', icon: '🐛' },
+  reactionGame: { title: 'Reaction Clicker', desc: 'Click the target instantly — test your reflex.', icon: '⚡' },
+  catchMyHeart: { title: 'Catch My Heart', desc: 'Catch falling hearts with your basket.', icon: '🧺' },
+  relationshipTrivia: { title: 'Arcade Trivia', desc: 'Test your gaming knowledge — 5 questions.', icon: '🎯' }
 };
 
 const GameRoom: React.FC = () => {
   const { gameId } = useParams<{ gameId: string }>();
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const { scores, saveGameScore } = useGameStore();
 
   const [scoreSaved, setScoreSaved] = useState(false);
@@ -56,6 +56,38 @@ const GameRoom: React.FC = () => {
 
   // Music: plays only after game has started and not paused
   useGameMusic(gameId, gameStarted && !isPaused && !showSaveModal);
+
+  // Track Playtime
+  const playtimeRef = useRef(user?.totalPlaytime || 0);
+  useEffect(() => {
+    if (user?.totalPlaytime !== undefined) {
+      playtimeRef.current = user.totalPlaytime;
+    }
+  }, [user?.totalPlaytime]);
+
+  useEffect(() => {
+    if (!gameStarted || isPaused || !user) return;
+
+    let secondsAccumulated = 0;
+    const interval = setInterval(() => {
+      secondsAccumulated += 1;
+      if (secondsAccumulated >= 10) {
+        const newTotal = playtimeRef.current + secondsAccumulated;
+        updateProfile({ totalPlaytime: newTotal });
+        playtimeRef.current = newTotal; // update ref immediately
+        secondsAccumulated = 0;
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+      if (secondsAccumulated > 0) {
+        const newTotal = playtimeRef.current + secondsAccumulated;
+        updateProfile({ totalPlaytime: newTotal });
+        playtimeRef.current = newTotal;
+      }
+    };
+  }, [gameStarted, isPaused, user?.uid, updateProfile]);
 
   // Listen for Esc key to exit fullscreen overlay; P to pause/resume
   useEffect(() => {
@@ -75,6 +107,7 @@ const GameRoom: React.FC = () => {
 
   useEffect(() => {
     if (!isFullscreen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFullscreenScale(1);
       return;
     }
@@ -84,14 +117,14 @@ const GameRoom: React.FC = () => {
     const updateScale = () => {
       const child = gameWrapperRef.current?.firstElementChild as HTMLElement;
       if (!child) return;
-      
+
       const w = child.offsetWidth || 400;
       const h = child.offsetHeight || 550;
-      
+
       const scaleW = (window.innerWidth - 40) / w;
       const scaleH = (window.innerHeight - 100) / h;
       const bestScale = Math.min(scaleW, scaleH);
-      
+
       setFullscreenScale(Math.max(1, bestScale));
     };
 
@@ -117,7 +150,9 @@ const GameRoom: React.FC = () => {
     };
   }, [isFullscreen, gameId]);
 
+  // Reset game state when navigating to a different game
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setScoreSaved(false);
     setLastScore(null);
     setShowSaveModal(false);
@@ -164,20 +199,20 @@ const GameRoom: React.FC = () => {
 
   const renderGame = () => {
     switch (gameId) {
-      case 'flappyBird':        return <FlappyBird onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'snake':             return <SnakeGame onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'ticTacToe':         return <TicTacToe onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'memoryGame':        return <MemoryGame onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'puzzle2048':        return <Puzzle2048 onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'sudoku':            return <Sudoku onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'neonSequence':      return <NeonSequence onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'spaceDodger':       return <SpaceDodger onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'brickBreaker':      return <BrickBreaker onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'whackABug':         return <WhackABug onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'reactionGame':      return <ReactionGame onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'catchMyHeart':      return <CatchMyHeart onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      case 'relationshipTrivia':return <RelationshipTrivia onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
-      default:                  return <div>Game under maintenance</div>;
+      case 'flappyBird': return <FlappyBird onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'snake': return <SnakeGame onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'ticTacToe': return <TicTacToe onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'memoryGame': return <MemoryGame onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'puzzle2048': return <Puzzle2048 onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'sudoku': return <Sudoku onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'neonSequence': return <NeonSequence onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'spaceDodger': return <SpaceDodger onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'brickBreaker': return <BrickBreaker onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'whackABug': return <WhackABug onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'reactionGame': return <ReactionGame onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'catchMyHeart': return <CatchMyHeart onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'relationshipTrivia': return <RelationshipTrivia onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      default: return <div>Game under maintenance</div>;
     }
   };
 
@@ -202,10 +237,10 @@ const GameRoom: React.FC = () => {
 
           {/* Game takes ALL remaining screen height and scales up */}
           <div className="flex-1 flex items-center justify-center overflow-hidden p-6 w-full h-full">
-            <div 
+            <div
               ref={gameWrapperRef}
-              style={{ 
-                transform: `scale(${fullscreenScale})`, 
+              style={{
+                transform: `scale(${fullscreenScale})`,
                 transformOrigin: 'center',
                 transition: 'transform 0.2s ease-out'
               }}
@@ -246,11 +281,10 @@ const GameRoom: React.FC = () => {
               {gameStarted && (
                 <button
                   onClick={() => setIsPaused(p => !p)}
-                  className={`absolute top-4 right-16 z-50 p-2.5 backdrop-blur-sm border rounded-xl transition-all shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 ${
-                    isPaused
-                      ? 'bg-arcade-green/20 hover:bg-arcade-green text-arcade-green hover:text-white border-arcade-green/50'
-                      : 'bg-slate-900/90 hover:bg-amber-500 text-slate-300 hover:text-white border-slate-700/50'
-                  }`}
+                  className={`absolute top-4 right-16 z-50 p-2.5 backdrop-blur-sm border rounded-xl transition-all shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 ${isPaused
+                    ? 'bg-arcade-green/20 hover:bg-arcade-green text-arcade-green hover:text-white border-arcade-green/50'
+                    : 'bg-slate-900/90 hover:bg-amber-500 text-slate-300 hover:text-white border-slate-700/50'
+                    }`}
                   title={isPaused ? 'Resume (P)' : 'Pause (P)'}
                 >
                   {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}

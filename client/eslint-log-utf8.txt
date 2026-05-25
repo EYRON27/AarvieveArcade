@@ -1,0 +1,154 @@
+﻿
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\components\landing\HeroSection.tsx
+  8:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\components\layout\Navbar.tsx
+  70:21  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\components\layout\Navbar.tsx:70:21
+  68 |   }, [musicEnabled, user, isGameMusicPlaying]);
+  69 |
+> 70 |   useEffect(() => { setMobileMenuOpen(false); }, [location.pathname]);
+     |                     ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  71 |
+  72 |   // Handle PWA Installation
+  73 |   useEffect(() => {  react-hooks/set-state-in-effect
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\contexts\AuthContext.tsx
+   36:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\contexts\AuthContext.tsx:36:9
+  34 |     if (cachedUser) {
+  35 |       try {
+> 36 |         setUser(JSON.parse(cachedUser));
+     |         ^^^^^^^ Avoid calling setState() directly within an effect
+  37 |       } catch { /* ignore corrupt cache */ }
+  38 |       setLoading(false);
+  39 |     }                                                                      react-hooks/set-state-in-effect
+   49:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\contexts\AuthContext.tsx:49:9
+  47 |       if (isLoggedIn) {
+  48 |         const mockUser = MockStorage.updateProfile({});
+> 49 |         setUser(mockUser);
+     |         ^^^^^^^ Avoid calling setState() directly within an effect
+  50 |         localStorage.setItem('aa_cached_user', JSON.stringify(mockUser));
+  51 |       } else {
+  52 |         setUser(null);  react-hooks/set-state-in-effect
+  211:41  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  223:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-refresh/only-export-components
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\brickBreaker\BrickBreaker.tsx
+  261:6  warning  React Hook useEffect has a missing dependency: 'onComplete'. Either include it or remove the dependency array. If 'onComplete' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\catchMyHeart\CatchMyHeart.tsx
+  207:6  warning  React Hook useEffect has missing dependencies: 'handleMouseMove' and 'onComplete'. Either include them or remove the dependency array. If 'onComplete' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\flappyBird\FlappyBird.tsx
+   60:6  warning  React Hook useEffect has a missing dependency: 'handleKeyPress'. Either include it or remove the dependency array                                                                                                                    react-hooks/exhaustive-deps
+  250:6  warning  React Hook useEffect has a missing dependency: 'onComplete'. Either include it or remove the dependency array. If 'onComplete' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\memoryGame\MemoryGame.tsx
+  26:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\neonSequence\NeonSequence.tsx
+  31:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\puzzle2048\Puzzle2048.tsx
+   83:13  error    'row' is never reassigned. Use 'const' instead                                                           prefer-const
+   95:13  error    'col' is never reassigned. Use 'const' instead                                                           prefer-const
+  166:6   warning  React Hook useEffect has a missing dependency: 'move'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\reactionGame\ReactionGame.tsx
+  16:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\snake\Snake.tsx
+  134:6  warning  React Hook useEffect has a missing dependency: 'onComplete'. Either include it or remove the dependency array. If 'onComplete' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\spaceDodger\SpaceDodger.tsx
+  231:6  warning  React Hook useEffect has missing dependencies: 'ASTEROID_COLORS' and 'onComplete'. Either include them or remove the dependency array. If 'onComplete' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\whackABug\WhackABug.tsx
+  30:5   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/purity')
+  35:5   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/purity')
+  43:7   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/purity')
+  44:18  error    Error: Cannot access variable before it is declared
+
+`spawnBug` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\whackABug\WhackABug.tsx:44:18
+  42 |       // Wait a tiny bit before spawning the next one
+  43 |       // eslint-disable-next-line react-hooks/purity
+> 44 |       setTimeout(spawnBug, Math.random() * 300 + 200);
+     |                  ^^^^^^^^ `spawnBug` accessed before it is declared
+  45 |     }, timeToDisappear);
+  46 |   // eslint-disable-next-line react-hooks/exhaustive-deps
+  47 |   }, []);
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\games\whackABug\WhackABug.tsx:28:3
+  26 |   };
+  27 |
+> 28 |   const spawnBug = useCallback(() => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 29 |     // 9 holes (0 to 8)
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 30 |     // eslint-disable-next-line react-hooks/purity
+     ΓÇª
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |   // eslint-disable-next-line react-hooks/exhaustive-deps
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 47 |   }, []);
+     | ^^^^^^^^^^ `spawnBug` is declared here
+  48 |
+  49 |   useEffect(() => {
+  50 |     if (gameState === 'playing' && !isPaused) {  react-hooks/immutability
+  46:3   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+  71:6   warning  React Hook useEffect has a missing dependency: 'spawnBug'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react-hooks/exhaustive-deps
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\pages\GameRoom.tsx
+   90:6  warning  React Hook useEffect has a missing dependency: 'user'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/exhaustive-deps
+  154:3  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect')
+  156:5  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\pages\GameRoom.tsx:156:5
+  154 |   // eslint-disable-next-line react-hooks/set-state-in-effect
+  155 |   useEffect(() => {
+> 156 |     setScoreSaved(false);
+      |     ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  157 |     setLastScore(null);
+  158 |     setShowSaveModal(false);
+  159 |     setIsPaused(false);  react-hooks/set-state-in-effect
+
+C:\Users\aaron\OneDrive\Documents\REACT\AarvieveArcade\client\src\services\firebase.ts
+  29:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  30:9   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  31:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Γ£û 31 problems (17 errors, 14 warnings)
+  2 errors and 5 warnings potentially fixable with the `--fix` option.
+
