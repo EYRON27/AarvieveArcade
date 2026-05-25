@@ -105,7 +105,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${firebaseUser.displayName || 'Player'}&backgroundColor=b6e3f4`,
               streak: 1,
               totalPoints: 10,
-              createdAt: new Date().toISOString()
+              createdAt: new Date().toISOString(),
+              unlockedAchievements: ['welcome'],
+              achievementDates: {
+                'welcome': new Date().toISOString()
+              }
             };
             await setDoc(userDocRef, newProfile);
             setUser(newProfile);
@@ -164,7 +168,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${name}&backgroundColor=b6e3f4`,
       streak: 1,
       totalPoints: 10,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      unlockedAchievements: ['welcome'],
+      achievementDates: {
+        'welcome': new Date().toISOString()
+      }
     };
     
     await setDoc(doc(db, 'users', userCredential.user.uid), newProfile);

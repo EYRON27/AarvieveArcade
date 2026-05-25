@@ -8,6 +8,8 @@ export interface UserProfile {
   totalPoints: number;
   createdAt: string;
   joinedDate?: string;
+  unlockedAchievements?: string[];
+  achievementDates?: Record<string, string>;
 }
 
 export interface GameScore {
