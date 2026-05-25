@@ -60,6 +60,43 @@ const SnakeGame: React.FC<SnakeProps> = ({ onComplete, onStart, isPaused = false
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
 
+  // Touch controls (Swipe)
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY
+    };
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touchEnd = {
+      x: e.changedTouches[0].clientX,
+      y: e.changedTouches[0].clientY
+    };
+
+    const dx = touchEnd.x - touchStartRef.current.x;
+    const dy = touchEnd.y - touchStartRef.current.y;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    if (Math.max(absDx, absDy) > 30) {
+      const dir = physicsRef.current.direction;
+      if (absDx > absDy) {
+        // Horizontal
+        if (dx > 0 && dir !== 'LEFT') physicsRef.current.nextDirection = 'RIGHT';
+        else if (dx < 0 && dir !== 'RIGHT') physicsRef.current.nextDirection = 'LEFT';
+      } else {
+        // Vertical
+        if (dy > 0 && dir !== 'UP') physicsRef.current.nextDirection = 'DOWN';
+        else if (dy < 0 && dir !== 'DOWN') physicsRef.current.nextDirection = 'UP';
+      }
+    }
+    touchStartRef.current = null;
+  };
+
   // Initialize canvas sizes
   useEffect(() => {
     const handleResize = () => {
@@ -242,7 +279,12 @@ const SnakeGame: React.FC<SnakeProps> = ({ onComplete, onStart, isPaused = false
   };
 
   return (
-    <div ref={containerRef} className="w-full flex flex-col items-center select-none">
+    <div 
+      ref={containerRef} 
+      className="w-full flex flex-col items-center select-none"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="relative border-4 border-slate-800 rounded-3xl overflow-hidden bg-slate-950 shadow-inner">
         <canvas ref={canvasRef} className="block" />
 
