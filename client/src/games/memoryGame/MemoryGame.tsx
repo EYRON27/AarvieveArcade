@@ -20,33 +20,49 @@ const MEMORY_SYMBOLS = ['💖', '🧁', '🍿', '🗼', '🧸', '🌹'];
 const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused = false }) => {
   const [cards, setCards] = useState<Card[]>([]);
   const [selectedCards, setSelectedCards] = useState<number[]>([]);
-  const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
-  const [seconds, setSeconds] = useState(0);
+  const [gameState, setGameState] = useState<'idle' | 'playing' | 'level-complete' | 'gameover'>('idle');
+  const [level, setLevel] = useState(1);
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(60);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const timerRef = useRef<any>(null);
 
   // Initialize cards
-  const initializeCards = () => {
-    // Duplicate symbols to create pairs
+  const initializeCards = (isNextLevel: boolean = false) => {
     const deckSymbols = [...MEMORY_SYMBOLS, ...MEMORY_SYMBOLS];
-    // Shuffle deck
     const shuffled = deckSymbols
       .map((sym, idx) => ({ id: idx, symbol: sym, isFlipped: false, isMatched: false }))
       .sort(() => Math.random() - 0.5);
 
     setCards(shuffled);
     setSelectedCards([]);
-    setSeconds(0);
+    
+    if (isNextLevel) {
+      setLevel(l => l + 1);
+      setTimeLeft(Math.max(15, 60 - (level * 5))); // Gets 5 seconds faster each level, down to 15s
+    } else {
+      setLevel(1);
+      setScore(0);
+      setTimeLeft(60);
+    }
+    
     setGameState('playing');
     onStart?.();
   };
 
-  // Stopwatch timer
+  // Countdown timer
   useEffect(() => {
     if (gameState === 'playing' && !isPaused) {
       timerRef.current = setInterval(() => {
-        setSeconds(prev => prev + 1);
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            setGameState('gameover');
+            return 0;
+          }
+          return prev - 1;
+        });
       }, 1000);
     } else {
       clearInterval(timerRef.current);
@@ -74,7 +90,8 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
 
           // Check if all matched
           if (next.every(c => c.isMatched)) {
-            setGameState('gameover');
+            setGameState('level-complete');
+            setScore(s => s + (level * 100) + (timeLeft * 10));
           }
           return next;
         });
@@ -96,10 +113,9 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
     return () => clearTimeout(timeoutId);
   }, [selectedCards, cards]);
 
-  // Trigger onComplete when gameover is reached
   useEffect(() => {
     if (gameState === 'gameover') {
-      onComplete(seconds);
+      onComplete(score);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState]);
@@ -126,7 +142,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
             COUPLE MEMORY DECK
           </h3>
           <button
-            onClick={initializeCards}
+            onClick={() => initializeCards(false)}
             className="flex items-center gap-2 bg-gradient-to-r from-arcade-green to-arcade-red text-slate-900 font-bold rounded-2xl px-6 py-4 shadow-lg text-sm select-none cursor-pointer"
           >
             <Play className="w-4 h-4 fill-slate-900" />
@@ -137,10 +153,13 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
 
       {gameState !== 'idle' && (
         <div className="flex flex-col items-center gap-6 w-full">
-          {/* Timer dashboard */}
-          <div className="flex items-center justify-between w-full bg-slate-900/60 border border-slate-800 rounded-2xl py-2 px-5 text-sm font-bold text-slate-300">
-            <span>Pairs Completed: {cards.filter(c => c.isMatched).length / 2} / 6</span>
-            <span className="font-mono text-arcade-green">Stopwatch: {seconds}s</span>
+          <div className="flex flex-col sm:flex-row items-center justify-between w-full bg-slate-900/60 border border-slate-800 rounded-2xl py-2 px-5 text-sm font-bold text-slate-300">
+            <span className="text-arcade-red">Level {level}</span>
+            <span>Pairs: {cards.filter(c => c.isMatched).length / 2} / 6</span>
+            <span>Score: <span className="text-arcade-yellow">{score}</span></span>
+            <span className={`font-mono ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-arcade-green'}`}>
+              Time: {timeLeft}s
+            </span>
           </div>
 
           {/* Cards Grid */}
@@ -193,15 +212,41 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
             })}
           </div>
 
+          {/* Level Complete overlay */}
+          {gameState === 'level-complete' && (
+            <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-30 rounded-3xl">
+              <span className="text-5xl mb-2">🎉</span>
+              <h3 className="font-pixel text-[11px] text-arcade-green text-center uppercase tracking-widest mb-2">
+                LEVEL {level} COMPLETE!
+              </h3>
+              <p className="text-slate-300 font-bold text-xs uppercase tracking-widest mb-6">Current Score: {score}</p>
+              
+              <button
+                onClick={() => initializeCards(true)}
+                className="flex items-center gap-1.5 mt-2 bg-gradient-to-r from-arcade-green to-arcade-blue text-slate-900 font-bold rounded-2xl px-6 py-3.5 text-xs tracking-wider uppercase transition-all shadow-lg hover:scale-105 select-none cursor-pointer"
+              >
+                <Play className="w-4 h-4 fill-slate-900" />
+                <span>NEXT LEVEL</span>
+              </button>
+            </div>
+          )}
+
           {/* Reset button if gameover */}
           {gameState === 'gameover' && (
-            <button
-              onClick={initializeCards}
-              className="flex items-center gap-1.5 mt-2 bg-slate-900 hover:bg-white hover:text-black text-white border-2 border-slate-800 rounded-2xl px-6 py-3.5 font-bold text-xs tracking-wider uppercase transition-all select-none cursor-pointer"
-            >
-              <RotateCcw className="w-4 h-4" />
-              <span>RESTART DECK</span>
-            </button>
+            <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-30 rounded-3xl">
+              <span className="text-5xl mb-2">⏱️</span>
+              <h3 className="font-pixel text-[11px] text-arcade-red text-center uppercase tracking-widest mb-2">
+                TIME'S UP!
+              </h3>
+              <p className="text-slate-300 font-bold text-xs uppercase tracking-widest mb-6">Final Score: {score}</p>
+              <button
+                onClick={() => initializeCards(false)}
+                className="flex items-center gap-1.5 mt-2 bg-slate-900 hover:bg-white hover:text-black text-white border-2 border-slate-800 rounded-2xl px-6 py-3.5 font-bold text-xs tracking-wider uppercase transition-all shadow-lg select-none cursor-pointer"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>TRY AGAIN</span>
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -211,4 +256,3 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
 };
 
 export default MemoryGame;
-

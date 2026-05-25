@@ -14,7 +14,9 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
   const [board, setBoard] = useState<BoardState>(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [winner, setWinner] = useState<'💖' | '⭐' | 'TIE' | null>(null);
-  const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
+  const [gameState, setGameState] = useState<'idle' | 'playing' | 'level-complete' | 'gameover'>('idle');
+  const [level, setLevel] = useState(1);
+  const [score, setScore] = useState(0);
 
   const checkWinner = (tempBoard: BoardState) => {
     const lines = [
@@ -74,9 +76,12 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
     for (let i = 0; i < 9; i++) {
       if (tempBoard[i] === null) {
         tempBoard[i] = '⭐';
-        // Add a slight chance of AI making random mistakes for easier gameplay
+        // Add a dynamic chance of AI making random mistakes based on level
+        // Level 1: 50% chance, Level 2: 35%, Level 3: 20%, Level 4: 5%, Level 5+: 0%
+        const randomChance = Math.max(0, 0.5 - ((level - 1) * 0.15));
+        const useRandom = Math.random() < randomChance;
         // eslint-disable-next-line react-hooks/purity
-        const val = Math.random() > 0.85 ? Math.floor(Math.random() * 10) - 5 : minimax(tempBoard, 0, false);
+        const val = useRandom ? Math.floor(Math.random() * 10) - 5 : minimax(tempBoard, 0, false);
         tempBoard[i] = null;
 
         if (val > bestVal) {
@@ -125,20 +130,26 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
 
   const endGame = (result: '💖' | '⭐' | 'TIE') => {
     setWinner(result);
-    setGameState('gameover');
     
-    // Complete with win: 1, draw/loss: 0
     if (result === '💖') {
-      onComplete(1);
+      setScore(s => s + (level * 100));
+      setGameState('level-complete');
     } else {
-      onComplete(0);
+      setGameState('gameover');
+      onComplete(score);
     }
   };
 
-  const startGame = () => {
+  const startGame = (isNextLevel: boolean = false) => {
     setBoard(Array(9).fill(null));
     setIsPlayerTurn(true);
     setWinner(null);
+    if (isNextLevel) {
+      setLevel(l => l + 1);
+    } else {
+      setLevel(1);
+      setScore(0);
+    }
     setGameState('playing');
     onStart?.();
   };
@@ -153,7 +164,7 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
             LOVE TIC-TAC-TOE
           </h3>
           <button
-            onClick={startGame}
+            onClick={() => startGame(false)}
             className="flex items-center gap-2 bg-gradient-to-r from-arcade-blue to-arcade-red text-white font-bold rounded-2xl px-6 py-4 shadow-lg text-sm select-none cursor-pointer"
           >
             <Play className="w-4 h-4 fill-white" />
@@ -164,8 +175,13 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
 
       {gameState !== 'idle' && (
         <div className="flex flex-col items-center gap-6 w-full">
+          <div className="flex items-center justify-between w-full bg-slate-900/60 border border-slate-800 rounded-2xl py-2 px-5 text-sm font-bold text-slate-300">
+            <span className="text-arcade-red">Level {level}</span>
+            <span>Score: <span className="text-arcade-yellow">{score}</span></span>
+          </div>
+
           {/* Header indicator */}
-          <div className="text-center bg-slate-900/60 border border-slate-800 rounded-2xl py-2 px-5 text-sm font-bold tracking-wider">
+          <div className="text-center bg-slate-900/60 border border-slate-800 rounded-2xl py-2 px-5 text-sm font-bold tracking-wider w-full">
             {winner === '💖' && <span className="text-arcade-red">💖 YOU WON! COIN SAVED</span>}
             {winner === '⭐' && <span className="text-slate-400">⭐ AI WON. INSERT COIN TO RETRY</span>}
             {winner === 'TIE' && <span className="text-slate-300">🎀 TIE GAME! EQUAL LOVE</span>}
@@ -194,15 +210,40 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
             ))}
           </div>
 
+          {/* Level Complete Overlay */}
+          {gameState === 'level-complete' && (
+            <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-30 rounded-3xl">
+              <span className="text-5xl mb-2">🎉</span>
+              <h3 className="font-pixel text-[11px] text-arcade-red text-center uppercase tracking-widest mb-2">
+                LEVEL {level} BEATEN!
+              </h3>
+              <p className="text-slate-300 font-bold text-xs uppercase tracking-widest mb-6">Current Score: {score}</p>
+              <button
+                onClick={() => startGame(true)}
+                className="flex items-center gap-1.5 mt-2 bg-gradient-to-r from-arcade-red to-arcade-blue text-white font-bold rounded-2xl px-6 py-3.5 text-xs tracking-wider uppercase transition-all shadow-lg hover:scale-105 select-none cursor-pointer"
+              >
+                <Play className="w-4 h-4 fill-white" />
+                <span>NEXT LEVEL</span>
+              </button>
+            </div>
+          )}
+
           {/* Reset button if gameover */}
           {gameState === 'gameover' && (
-            <button
-              onClick={startGame}
-              className="flex items-center gap-1.5 mt-2 bg-slate-900 hover:bg-white hover:text-black text-white border-2 border-slate-800 rounded-2xl px-6 py-3.5 font-bold text-xs tracking-wider uppercase transition-all select-none cursor-pointer"
-            >
-              <RotateCcw className="w-4 h-4" />
-              <span>PLAY AGAIN</span>
-            </button>
+            <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-30 rounded-3xl">
+              <span className="text-5xl mb-2">{winner === 'TIE' ? '🎀' : '💔'}</span>
+              <h3 className="font-pixel text-[11px] text-slate-400 text-center uppercase tracking-widest mb-2">
+                {winner === 'TIE' ? 'TIE GAME!' : 'AI DEFEATED YOU!'}
+              </h3>
+              <p className="text-slate-300 font-bold text-xs uppercase tracking-widest mb-6">Final Score: {score}</p>
+              <button
+                onClick={() => startGame(false)}
+                className="flex items-center gap-1.5 mt-2 bg-slate-900 hover:bg-white hover:text-black text-white border-2 border-slate-800 rounded-2xl px-6 py-3.5 font-bold text-xs tracking-wider uppercase transition-all shadow-lg select-none cursor-pointer"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>TRY AGAIN</span>
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -212,4 +253,3 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
 };
 
 export default TicTacToe;
-

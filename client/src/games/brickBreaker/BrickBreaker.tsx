@@ -11,7 +11,8 @@ interface BrickBreakerProps {
 const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaused = false }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover' | 'won'>('idle');
+  const [gameState, setGameState] = useState<'idle' | 'playing' | 'level-complete' | 'gameover' | 'won'>('idle');
+  const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
 
   const physicsRef = useRef({
@@ -28,7 +29,8 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
     ballDY: -3,
     ballRadius: 6,
     bricks: [] as Array<{ x: number; y: number; width: number; height: number; status: number; color: string }>,
-    score: 0
+    score: 0,
+    level: 1
   });
 
   const BRICK_ROW_COUNT = 5;
@@ -58,24 +60,35 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
     return bricks;
   };
 
-  const startGame = () => {
+  const startGame = (isNextLevel: boolean = false) => {
+    const currentLevel = isNextLevel ? level + 1 : 1;
+    if (isNextLevel) {
+      setLevel(currentLevel);
+    } else {
+      setLevel(1);
+      setScore(0);
+    }
+
+    const speedMult = 1 + (currentLevel * 0.15);
+
     physicsRef.current = {
       paddleX: 200,
       paddleY: 420,
-      paddleWidth: 80,
+      paddleWidth: Math.max(40, 80 - (currentLevel * 4)), // Paddle gets slightly smaller each level
       paddleHeight: 12,
       paddleSpeed: 7,
       movingLeft: false,
       movingRight: false,
       ballX: 240,
       ballY: 400,
-      ballDX: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 2 + 2),
-      ballDY: -4,
+      ballDX: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 2 + 2) * speedMult,
+      ballDY: -4 * speedMult,
       ballRadius: 6,
       bricks: initBricks(),
-      score: 0
+      score: isNextLevel ? score : 0,
+      level: currentLevel
     };
-    setScore(0);
+    
     setGameState('playing');
     onStart?.();
   };
@@ -207,10 +220,11 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
           }
         }
 
-        // Win condition
+        // Win condition (Level Complete)
         if (activeBricks === 0) {
-          setGameState('won');
-          onComplete(state.score + 500); // bonus for clearing board
+          setGameState('level-complete');
+          state.score += state.level * 500; // bonus for clearing board
+          setScore(state.score);
         }
       }
 
@@ -273,25 +287,25 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
           <span className="font-pixel text-xl text-white block leading-none">{score}</span>
         </div>
       </div>
-
       <div className="relative border-4 border-slate-800 rounded-3xl overflow-hidden bg-slate-900 shadow-2xl">
-        <canvas
-          ref={canvasRef}
-          className="block touch-none cursor-ew-resize"
-          onPointerMove={handlePointerMove}
-          onPointerDown={handlePointerMove}
-        />
+        <canvas ref={canvasRef} onPointerMove={handlePointerMove} className="block w-full h-[450px] touch-none" style={{ touchAction: 'none' }} />
+
+        {/* HUD overlay */}
+        <div className="absolute top-4 left-4 right-4 font-pixel tracking-widest text-slate-100 bg-slate-950/60 backdrop-blur-sm border border-slate-800 rounded-2xl px-4 py-2 text-sm z-20 flex justify-between items-center select-none pointer-events-none">
+          <span className="text-arcade-red">LEVEL {level}</span>
+          <span>SCORE: <span className="text-arcade-yellow">{score}</span></span>
+        </div>
 
         {/* Start Screen */}
         {gameState === 'idle' && (
-          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-30">
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-30 pointer-events-auto">
             <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-6xl mb-4">🧱</motion.span>
             <h3 className="font-pixel text-[11px] text-arcade-blue text-center uppercase tracking-widest mb-6">
               SMASH THE BRICKS
             </h3>
             <button
-              onClick={startGame}
-              className="flex items-center gap-2 bg-gradient-to-r from-arcade-blue to-cyan-500 hover:from-cyan-400 hover:to-blue-400 text-white font-bold rounded-2xl px-6 py-4 shadow-lg text-sm select-none transition-all"
+              onClick={() => startGame(false)}
+              className="flex items-center gap-2 bg-gradient-to-r from-arcade-blue to-cyan-500 hover:from-cyan-400 hover:to-blue-400 text-white font-bold rounded-2xl px-6 py-4 shadow-lg text-sm select-none transition-all cursor-pointer"
             >
               <Play className="w-4 h-4 fill-white" />
               <span>START GAME</span>
@@ -302,38 +316,40 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
           </div>
         )}
 
-        {/* Game Over Screen */}
-        {gameState === 'gameover' && (
-          <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-30">
-            <span className="text-5xl mb-2">💥</span>
-            <h3 className="font-pixel text-[11px] text-red-400 text-center uppercase tracking-widest mb-2">
-              BALL DROPPED
+        {/* Level Complete Screen */}
+        {gameState === 'level-complete' && (
+          <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-xs flex flex-col items-center justify-center p-4 z-30 pointer-events-auto">
+            <span className="text-6xl mb-4">🏆</span>
+            <h3 className="font-pixel text-[11px] text-arcade-green neon-text-green text-center uppercase tracking-widest mb-2">
+              LEVEL {level} CLEARED!
             </h3>
-            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">FINAL SCORE: {score}</p>
+            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">SCORE: {score}</p>
+            
             <button
-              onClick={startGame}
-              className="flex items-center gap-1.5 bg-slate-900 hover:bg-white hover:text-black text-white border-2 border-slate-800 rounded-2xl px-6 py-3.5 font-bold text-xs tracking-wider uppercase transition-all"
+              onClick={() => startGame(true)}
+              className="flex items-center gap-1.5 bg-gradient-to-r from-arcade-green to-arcade-blue text-white hover:text-black border-2 border-slate-800 rounded-2xl px-6 py-3.5 font-bold text-xs tracking-wider uppercase transition-all shadow-lg hover:scale-105 select-none cursor-pointer"
             >
-              <RotateCcw className="w-4 h-4" />
-              <span>TRY AGAIN</span>
+              <Play className="w-4 h-4" />
+              <span>NEXT LEVEL</span>
             </button>
           </div>
         )}
 
-        {/* Win Screen */}
-        {gameState === 'won' && (
-          <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-30">
-            <span className="text-5xl mb-2">🏆</span>
-            <h3 className="font-pixel text-[11px] text-arcade-green text-center uppercase tracking-widest mb-2 neon-text-green">
-              BOARD CLEARED!
+        {/* Game Over Screen */}
+        {gameState === 'gameover' && (
+          <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-xs flex flex-col items-center justify-center p-4 z-30 pointer-events-auto">
+            <span className="text-5xl mb-2">💥</span>
+            <h3 className="font-pixel text-[11px] text-red-400 text-center uppercase tracking-widest mb-2">
+              PADDLE MISSED
             </h3>
-            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">FINAL SCORE: {score + 500} (+500 BONUS)</p>
+            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">FINAL SCORE: {score}</p>
+            
             <button
-              onClick={startGame}
-              className="flex items-center gap-1.5 bg-arcade-green hover:bg-emerald-400 text-white border-2 border-transparent rounded-2xl px-6 py-3.5 font-bold text-xs tracking-wider uppercase transition-all shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+              onClick={() => startGame(false)}
+              className="flex items-center gap-1.5 bg-slate-900 hover:bg-white hover:text-black text-white border-2 border-slate-800 rounded-2xl px-6 py-3.5 font-bold text-xs tracking-wider uppercase transition-all shadow-lg select-none cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
-              <span>PLAY AGAIN</span>
+              <span>TRY AGAIN</span>
             </button>
           </div>
         )}
