@@ -61,18 +61,19 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
     const firstCard = cards[firstIdx];
     const secondCard = cards[secondIdx];
 
+    let timeoutId: NodeJS.Timeout;
+
     if (firstCard.symbol === secondCard.symbol) {
       // It's a match!
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setCards(prev => {
           const next = [...prev];
-          next[firstIdx].isMatched = true;
-          next[secondIdx].isMatched = true;
+          next[firstIdx] = { ...next[firstIdx], isMatched: true };
+          next[secondIdx] = { ...next[secondIdx], isMatched: true };
           
           // Check if all matched
           if (next.every(c => c.isMatched)) {
             setGameState('gameover');
-            onComplete(seconds);
           }
           return next;
         });
@@ -80,24 +81,34 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
       }, 500);
     } else {
       // Flip back
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setCards(prev => {
           const next = [...prev];
-          next[firstIdx].isFlipped = false;
-          next[secondIdx].isFlipped = false;
+          next[firstIdx] = { ...next[firstIdx], isFlipped: false };
+          next[secondIdx] = { ...next[secondIdx], isFlipped: false };
           return next;
         });
         setSelectedCards([]);
       }, 800);
     }
-  }, [selectedCards, cards, seconds]);
+
+    return () => clearTimeout(timeoutId);
+  }, [selectedCards, cards]);
+
+  // Trigger onComplete when gameover is reached
+  useEffect(() => {
+    if (gameState === 'gameover') {
+      onComplete(seconds);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState]);
 
   const handleCardClick = (idx: number) => {
     if (isPaused || cards[idx].isFlipped || cards[idx].isMatched || selectedCards.length >= 2 || gameState !== 'playing') return;
 
     setCards(prev => {
       const next = [...prev];
-      next[idx].isFlipped = true;
+      next[idx] = { ...next[idx], isFlipped: true };
       return next;
     });
 

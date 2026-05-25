@@ -133,7 +133,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
           gId,
           scores: snap.docs
             .map(d => ({ id: d.id, ...d.data() } as GameScore))
-            .sort((a, b) => gId === 'reactionGame' ? a.score - b.score : b.score - a.score)
+            .sort((a, b) => (gId === 'reactionGame' || gId === 'memoryGame') ? a.score - b.score : b.score - a.score)
             .slice(0, 10) // top 10 client-side
         }))
       );
@@ -178,7 +178,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       // Update local scores immediately (no need to refetch)
       const updatedScores = { ...get().scores };
       const list = [...(updatedScores[gameId] || []), { id: ref.id, ...data }]
-        .sort((a, b) => gameId === 'reactionGame' ? a.score - b.score : b.score - a.score)
+        .sort((a, b) => (gameId === 'reactionGame' || gameId === 'memoryGame') ? a.score - b.score : b.score - a.score)
         .slice(0, 10);
       updatedScores[gameId] = list;
       set({ scores: updatedScores });
