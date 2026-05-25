@@ -67,7 +67,10 @@ const Navbar: React.FC = () => {
     }
   }, [musicEnabled, user, isGameMusicPlaying]);
 
-  useEffect(() => { setMobileMenuOpen(false); }, [location.pathname]);
+  useEffect(() => { 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMobileMenuOpen(false); 
+  }, [location.pathname]);
 
   // Handle PWA Installation
   useEffect(() => {

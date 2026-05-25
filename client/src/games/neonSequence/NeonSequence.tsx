@@ -28,7 +28,9 @@ const NeonSequence: React.FC<NeonSequenceProps> = ({ onComplete, onStart, isPaus
     // Initialize audio context on first interaction
     const initAudio = () => {
       if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        audioCtxRef.current = new AudioContext();
       }
     };
     window.addEventListener('click', initAudio, { once: true });
