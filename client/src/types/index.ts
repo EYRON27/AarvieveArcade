@@ -17,6 +17,7 @@ export interface GameScore {
   id?: string;
   userId: string;
   userDisplayName: string;
+  userAvatarUrl?: string;
   gameId: string;
   score: number;
   timestamp: string;
