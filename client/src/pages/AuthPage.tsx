@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,11 +11,7 @@ const AuthPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const [isLogin, setIsLogin] = useState(location.pathname !== '/register');
-
-  useEffect(() => {
-    setIsLogin(location.pathname !== '/register');
-  }, [location.pathname]);
+  const isLogin = location.pathname !== '/register';
 
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail]             = useState('');
@@ -35,10 +31,11 @@ const AuthPage: React.FC = () => {
         setLoading(true);
         await login(email, password);
         navigate('/dashboard');
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const firebaseErr = err as { code?: string; message?: string };
         let errorMessage = 'Sign in failed. Check your credentials.';
-        if (err.code) {
-          switch (err.code) {
+        if (firebaseErr.code) {
+          switch (firebaseErr.code) {
             case 'auth/invalid-credential':
             case 'auth/user-not-found':
             case 'auth/wrong-password':
@@ -53,8 +50,8 @@ const AuthPage: React.FC = () => {
             default:
               errorMessage = 'Authentication failed. Please try again.';
           }
-        } else if (err.message && !err.message.includes('Firebase')) {
-          errorMessage = err.message;
+        } else if (firebaseErr.message && !firebaseErr.message.includes('Firebase')) {
+          errorMessage = firebaseErr.message;
         }
         setError(errorMessage);
         setLoading(false);
@@ -67,10 +64,11 @@ const AuthPage: React.FC = () => {
         await new Promise(r => setTimeout(r, 1500)); // Artificial delay for effect
         await register(email, password, displayName);
         navigate('/dashboard');
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const firebaseErr = err as { code?: string; message?: string };
         let errorMessage = 'Account creation failed. Email may already be in use.';
-        if (err.code) {
-          switch (err.code) {
+        if (firebaseErr.code) {
+          switch (firebaseErr.code) {
             case 'auth/email-already-in-use':
               errorMessage = 'An account with this email already exists.';
               break;
@@ -86,8 +84,8 @@ const AuthPage: React.FC = () => {
             default:
               errorMessage = 'Registration failed. Please try again.';
           }
-        } else if (err.message && !err.message.includes('Firebase')) {
-          errorMessage = err.message;
+        } else if (firebaseErr.message && !firebaseErr.message.includes('Firebase')) {
+          errorMessage = firebaseErr.message;
         }
         setError(errorMessage);
         setLoading(false);

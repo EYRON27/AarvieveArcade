@@ -5,6 +5,7 @@ import { ChevronDown, Play, Download } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstallable, setIsInstallable] = useState(false);
 

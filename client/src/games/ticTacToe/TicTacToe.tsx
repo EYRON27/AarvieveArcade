@@ -75,6 +75,7 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
       if (tempBoard[i] === null) {
         tempBoard[i] = '⭐';
         // Add a slight chance of AI making random mistakes for easier gameplay
+        // eslint-disable-next-line react-hooks/purity
         const val = Math.random() > 0.85 ? Math.floor(Math.random() * 10) - 5 : minimax(tempBoard, 0, false);
         tempBoard[i] = null;
 
@@ -108,6 +109,7 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
     setTimeout(() => {
       const aiMove = getBestMove(newBoard);
       if (aiMove !== -1) {
+        // eslint-disable-next-line react-hooks/immutability
         newBoard[aiMove] = '⭐';
         setBoard(newBoard);
         

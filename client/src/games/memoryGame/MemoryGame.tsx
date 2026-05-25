@@ -23,6 +23,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
   const [seconds, setSeconds] = useState(0);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const timerRef = useRef<any>(null);
 
   // Initialize cards
@@ -70,7 +71,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
           const next = [...prev];
           next[firstIdx] = { ...next[firstIdx], isMatched: true };
           next[secondIdx] = { ...next[secondIdx], isMatched: true };
-          
+
           // Check if all matched
           if (next.every(c => c.isMatched)) {
             setGameState('gameover');
@@ -117,7 +118,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
 
   return (
     <div className="w-full max-w-sm flex flex-col items-center select-none py-4 px-2">
-      
+
       {gameState === 'idle' && (
         <div className="flex flex-col items-center justify-center text-center py-10">
           <span className="text-7xl mb-4 animate-float">🧠</span>
@@ -146,7 +147,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
           <div className="grid grid-cols-3 gap-3.5 bg-slate-900/40 border border-slate-800 rounded-3xl p-4.5 w-full aspect-square">
             {cards.map((card, idx) => {
               const showSymbol = card.isFlipped || card.isMatched;
-              
+
               return (
                 <div
                   key={card.id}

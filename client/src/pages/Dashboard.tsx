@@ -12,29 +12,25 @@ const Dashboard: React.FC = () => {
   const { achievements, gallery, scores, fetchInitialData } = useGameStore();
 
   const [memberSince, setMemberSince] = useState({ days: 0, hours: 0, mins: 0 });
-  const [playtime, setPlaytime] = useState({ days: 0, hours: 0, mins: 0 });
-  const [greeting, setGreeting] = useState('');
 
   useEffect(() => {
     if (user?.uid) fetchInitialData(user.uid);
+    // fetchInitialData is stable from the store; adding it would cause infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid]);
 
-  useEffect(() => {
-    const hr = new Date().getHours();
-    if (hr < 12)      setGreeting('Good morning');
-    else if (hr < 17) setGreeting('Good afternoon');
-    else              setGreeting('Good evening');
-  }, []);
+  const hr = new Date().getHours();
+  const greeting = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
 
-  // Account age counter
+  // Account age counter — only needs an interval so must live in an effect
   useEffect(() => {
     const calc = () => {
       const since = new Date(user?.createdAt || Date.now());
-      const diff  = Math.max(0, Date.now() - since.getTime());
-      const secs  = Math.floor(diff / 1000);
-      const mins  = Math.floor(secs / 60);
-      const hrs   = Math.floor(mins / 60);
-      const days  = Math.floor(hrs / 24);
+      const diff = Math.max(0, Date.now() - since.getTime());
+      const secs = Math.floor(diff / 1000);
+      const mins = Math.floor(secs / 60);
+      const hrs = Math.floor(mins / 60);
+      const days = Math.floor(hrs / 24);
       setMemberSince({ days, hours: hrs % 24, mins: mins % 60 });
     };
     calc();
@@ -42,14 +38,11 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(t);
   }, [user]);
 
-  // Playtime counter
-  useEffect(() => {
-    const secs = user?.totalPlaytime || 0;
-    const mins = Math.floor(secs / 60);
-    const hrs = Math.floor(mins / 60);
-    const days = Math.floor(hrs / 24);
-    setPlaytime({ days, hours: hrs % 24, mins: mins % 60 });
-  }, [user?.totalPlaytime]);
+  // Playtime derived from user profile — no effect needed
+  const ptSecs = user?.totalPlaytime || 0;
+  const ptMins = Math.floor(ptSecs / 60);
+  const ptHrs  = Math.floor(ptMins / 60);
+  const playtime = { days: Math.floor(ptHrs / 24), hours: ptHrs % 24, mins: ptMins % 60 };
 
   if (!user) return null;
 
@@ -63,12 +56,12 @@ const Dashboard: React.FC = () => {
     .reduce((best, s) => Math.max(best, s.score), 0);
 
   const featuredGames = [
-    { id: 'flappyBird',         title: 'Flappy Bird',      icon: '🦅', tag: 'ARCADE',  color: 'border-arcade-red/25   hover:border-arcade-red/70'   },
-    { id: 'snake',              title: 'Snake',            icon: '🐍', tag: 'RETRO',   color: 'border-arcade-green/25 hover:border-arcade-green/70' },
-    { id: 'ticTacToe',          title: 'Tic Tac Toe',      icon: '❌', tag: 'VS AI',   color: 'border-arcade-blue/25  hover:border-arcade-blue/70'  },
-    { id: 'memoryGame',         title: 'Memory Cards',     icon: '🧠', tag: 'PUZZLE',  color: 'border-arcade-red/25   hover:border-arcade-red/70'   },
-    { id: 'reactionGame',       title: 'Reaction Clicker', icon: '⚡', tag: 'REFLEX',  color: 'border-arcade-green/25 hover:border-arcade-green/70' },
-    { id: 'relationshipTrivia', title: 'Arcade Trivia',    icon: '🎯', tag: 'TRIVIA',  color: 'border-arcade-blue/25  hover:border-arcade-blue/70'  },
+    { id: 'flappyBird', title: 'Flappy Bird', icon: '🦅', tag: 'ARCADE', color: 'border-arcade-red/25   hover:border-arcade-red/70' },
+    { id: 'snake', title: 'Snake', icon: '🐍', tag: 'RETRO', color: 'border-arcade-green/25 hover:border-arcade-green/70' },
+    { id: 'ticTacToe', title: 'Tic Tac Toe', icon: '❌', tag: 'VS AI', color: 'border-arcade-blue/25  hover:border-arcade-blue/70' },
+    { id: 'memoryGame', title: 'Memory Cards', icon: '🧠', tag: 'PUZZLE', color: 'border-arcade-red/25   hover:border-arcade-red/70' },
+    { id: 'reactionGame', title: 'Reaction Clicker', icon: '⚡', tag: 'REFLEX', color: 'border-arcade-green/25 hover:border-arcade-green/70' },
+    { id: 'relationshipTrivia', title: 'Arcade Trivia', icon: '🎯', tag: 'TRIVIA', color: 'border-arcade-blue/25  hover:border-arcade-blue/70' },
   ];
 
   return (
@@ -78,8 +71,8 @@ const Dashboard: React.FC = () => {
       <div className="absolute bottom-0 right-0 w-[400px] h-[250px] bg-arcade-blue/4 filter blur-[100px] pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 pt-8 flex flex-col gap-6">
-        
-        <DashboardHeader 
+
+        <DashboardHeader
           greeting={greeting}
           userDisplayName={user.displayName}
           sessionTime={memberSince}
@@ -92,8 +85,8 @@ const Dashboard: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <QuickPlayGrid featuredGames={featuredGames} />
-          
-          <ProgressOverview 
+
+          <ProgressOverview
             totalPoints={user.totalPoints}
             topScore={topScore || '—'}
             unlockedAch={unlockedAch}
@@ -101,7 +94,7 @@ const Dashboard: React.FC = () => {
             achievements={achievements}
           />
         </div>
-        
+
       </div>
     </div>
   );

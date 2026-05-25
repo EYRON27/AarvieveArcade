@@ -80,7 +80,7 @@ const Puzzle2048: React.FC<Puzzle2048Props> = ({ onComplete, onStart, isPaused =
 
     if (direction === 'LEFT' || direction === 'RIGHT') {
       for (let r = 0; r < 4; r++) {
-        let row = newGrid[r];
+        const row = newGrid[r];
         if (direction === 'RIGHT') row.reverse();
         
         const newRow = slideAndMergeLine(row);
@@ -92,7 +92,7 @@ const Puzzle2048: React.FC<Puzzle2048Props> = ({ onComplete, onStart, isPaused =
       }
     } else if (direction === 'UP' || direction === 'DOWN') {
       for (let c = 0; c < 4; c++) {
-        let col = [newGrid[0][c], newGrid[1][c], newGrid[2][c], newGrid[3][c]];
+        const col = [newGrid[0][c], newGrid[1][c], newGrid[2][c], newGrid[3][c]];
         if (direction === 'DOWN') col.reverse();
         
         const newCol = slideAndMergeLine(col);

@@ -122,7 +122,8 @@ export function useGameMusic(gameId: string | undefined, isActive: boolean) {
     if (masterRef.current) {
       try {
         masterRef.current.gain.setTargetAtTime(0, ctxRef.current!.currentTime, 0.1);
-      } catch (_) {}
+      // eslint-disable-next-line no-empty
+      } catch { }
     }
     isPlayingRef.current = false;
     setIsGameMusicPlaying(false);

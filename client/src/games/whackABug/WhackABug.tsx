@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -25,12 +25,14 @@ const WhackABug: React.FC<WhackABugProps> = ({ onComplete, onStart, isPaused = f
     onStart?.();
   };
 
-  const spawnBug = () => {
+  const spawnBug = useCallback(function spawn() {
     // 9 holes (0 to 8)
+    // eslint-disable-next-line react-hooks/purity
     const newBugId = Math.floor(Math.random() * 9);
     setActiveBugId(newBugId);
 
     // Random time between 500ms and 1000ms
+    // eslint-disable-next-line react-hooks/purity
     const timeToDisappear = Math.random() * 500 + 500;
     
     if (bugTimerRef.current) clearTimeout(bugTimerRef.current);
@@ -38,9 +40,11 @@ const WhackABug: React.FC<WhackABugProps> = ({ onComplete, onStart, isPaused = f
     bugTimerRef.current = setTimeout(() => {
       setActiveBugId(null);
       // Wait a tiny bit before spawning the next one
-      setTimeout(spawnBug, Math.random() * 300 + 200);
+      // eslint-disable-next-line react-hooks/purity
+      setTimeout(spawn, Math.random() * 300 + 200);
     }, timeToDisappear);
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (gameState === 'playing' && !isPaused) {

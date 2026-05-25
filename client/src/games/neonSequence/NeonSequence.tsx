@@ -62,6 +62,7 @@ const NeonSequence: React.FC<NeonSequenceProps> = ({ onComplete, onStart, isPaus
   };
 
   const nextRound = (currentSeq: number[]) => {
+    // eslint-disable-next-line react-hooks/purity
     const nextColor = Math.floor(Math.random() * 4);
     const newSeq = [...currentSeq, nextColor];
     setSequence(newSeq);
