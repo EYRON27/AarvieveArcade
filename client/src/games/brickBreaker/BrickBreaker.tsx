@@ -279,22 +279,19 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
 
       {/* HUD Header */}
       <div className="w-full max-w-sm flex justify-between items-center mb-4 px-4">
-        <h2 className="pixel-text text-arcade-blue neon-text-blue tracking-widest text-sm uppercase">
-          BRICK BREAKER
-        </h2>
-        <div className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2">
+        <div className="flex flex-col">
+          <h2 className="pixel-text text-arcade-blue neon-text-blue tracking-widest text-sm uppercase mb-1">
+            BRICK BREAKER
+          </h2>
+          <span className="text-arcade-red font-pixel text-[10px] tracking-widest">LEVEL {level}</span>
+        </div>
+        <div className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-right">
           <span className="text-[10px] text-slate-500 uppercase tracking-widest block mb-0.5">SCORE</span>
           <span className="font-pixel text-xl text-white block leading-none">{score}</span>
         </div>
       </div>
       <div className="relative border-4 border-slate-800 rounded-3xl overflow-hidden bg-slate-900 shadow-2xl">
         <canvas ref={canvasRef} onPointerMove={handlePointerMove} className="block w-full h-[450px] touch-none" style={{ touchAction: 'none' }} />
-
-        {/* HUD overlay */}
-        <div className="absolute top-4 left-4 right-4 font-pixel tracking-widest text-slate-100 bg-slate-950/60 backdrop-blur-sm border border-slate-800 rounded-2xl px-4 py-2 text-sm z-20 flex justify-between items-center select-none pointer-events-none">
-          <span className="text-arcade-red">LEVEL {level}</span>
-          <span>SCORE: <span className="text-arcade-yellow">{score}</span></span>
-        </div>
 
         {/* Start Screen */}
         {gameState === 'idle' && (
