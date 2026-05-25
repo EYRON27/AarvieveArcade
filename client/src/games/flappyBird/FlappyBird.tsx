@@ -88,14 +88,25 @@ const FlappyBird: React.FC<FlappyBirdProps> = ({ onComplete, onStart, isPaused =
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // Determine theme based on score
+      const getTheme = (currentScore: number) => {
+        if (currentScore >= 200) return { bg: '#332200', moon: 'rgba(255, 215, 0, 0.1)' };
+        if (currentScore >= 150) return { bg: '#2a0808', moon: 'rgba(255, 0, 0, 0.05)' };
+        if (currentScore >= 100) return { bg: '#061c24', moon: 'rgba(0, 255, 100, 0.05)' };
+        if (currentScore >= 50)  return { bg: '#2d1b2e', moon: 'rgba(255, 165, 0, 0.05)' };
+        return { bg: '#0f0c26', moon: 'rgba(255, 107, 157, 0.05)' };
+      };
+      
+      const theme = getTheme(physicsRef.current.score);
+
       // 1. Draw beautiful starry background sky
-      ctx.fillStyle = '#0f0c26';
+      ctx.fillStyle = theme.bg;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw glowing background pink bubble/moon
+      // Draw glowing background bubble/moon
       ctx.beginPath();
       ctx.arc(canvas.width / 2, canvas.height / 2 + 30, 120, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255, 107, 157, 0.05)';
+      ctx.fillStyle = theme.moon;
       ctx.fill();
       ctx.closePath();
 
