@@ -19,6 +19,7 @@ const GAME_LABELS: Record<string, { label: string; icon: string }> = {
   reactionGame:       { label: 'Reaction Clicker',  icon: '⚡' },
   catchMyHeart:       { label: 'Catch My Heart',    icon: '🧺' },
   relationshipTrivia: { label: 'Arcade Trivia',     icon: '🎯' },
+  cupShuffle:         { label: 'Cup Shuffle',       icon: '🥤' },
 };
 
 const Leaderboard: React.FC = () => {

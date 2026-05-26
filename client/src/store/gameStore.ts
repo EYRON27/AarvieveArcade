@@ -46,7 +46,7 @@ const ALL_GALLERY: GalleryItem[] = [
   { id: 'high_roller',     title: 'High Roller 🎰',           description: 'A retro arcade slot machine hitting a jackpot.', imageUrl: '/gallery/gallery_highroller_1779587350225.png', unlockCondition: 'Unlock: Accumulate 200 total points across all games.', isUnlocked: false },
 ];
 
-const ALL_GAME_IDS = ['flappyBird', 'snake', 'ticTacToe', 'memoryGame', 'puzzle2048', 'sudoku', 'neonSequence', 'spaceDodger', 'brickBreaker', 'whackABug', 'reactionGame', 'catchMyHeart', 'relationshipTrivia'];
+const ALL_GAME_IDS = ['flappyBird', 'snake', 'ticTacToe', 'memoryGame', 'puzzle2048', 'sudoku', 'neonSequence', 'spaceDodger', 'brickBreaker', 'whackABug', 'reactionGame', 'catchMyHeart', 'relationshipTrivia', 'cupShuffle'];
 
 interface GameStoreState {
   achievements: Achievement[];
