@@ -25,6 +25,7 @@ const WhackABug = lazy(() => import('../games/whackABug/WhackABug'));
 const ReactionGame = lazy(() => import('../games/reactionGame/ReactionGame'));
 const CatchMyHeart = lazy(() => import('../games/catchMyHeart/CatchMyHeart'));
 const RelationshipTrivia = lazy(() => import('../games/coupleGames/RelationshipTrivia'));
+const CupShuffle = lazy(() => import('../games/cupShuffle/CupShuffle'));
 
 const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }> = {
   flappyBird: { title: 'Flappy Bird', desc: 'Navigate through obstacles without crashing.', icon: '🦅' },
@@ -39,7 +40,8 @@ const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }
   whackABug: { title: 'Whack-A-Bug', desc: 'Smash as many bugs as you can in 30s.', icon: '🐛' },
   reactionGame: { title: 'Reaction Clicker', desc: 'Click the target instantly — test your reflex.', icon: '⚡' },
   catchMyHeart: { title: 'Catch My Heart', desc: 'Catch falling hearts with your basket.', icon: '🧺' },
-  relationshipTrivia: { title: 'Arcade Trivia', desc: 'Test your gaming knowledge — 5 questions.', icon: '🎯' }
+  relationshipTrivia: { title: 'Arcade Trivia', desc: 'Test your gaming knowledge — 5 questions.', icon: '🎯' },
+  cupShuffle: { title: 'Cup Shuffle', desc: 'Follow the shuffle and find where Pou is hiding!', icon: '🥤' }
 };
 
 const GameRoom: React.FC = () => {
@@ -212,6 +214,7 @@ const GameRoom: React.FC = () => {
       case 'reactionGame': return <ReactionGame onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
       case 'catchMyHeart': return <CatchMyHeart onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
       case 'relationshipTrivia': return <RelationshipTrivia onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'cupShuffle': return <CupShuffle onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
       default: return <div>Game under maintenance</div>;
     }
   };
