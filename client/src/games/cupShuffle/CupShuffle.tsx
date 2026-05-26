@@ -194,9 +194,9 @@ const CupShuffle: React.FC<CupShuffleProps> = ({ onComplete, onStart, isPaused =
           {/* Table surface */}
           <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-r from-[#2a1a0e] via-[#3d2510] to-[#2a1a0e] rounded-xl shadow-inner border-t-2 border-[#5a3a20]" />
 
-          {/* Render cups in their current visual slots */}
-          {Array.from({ length: NUM_CUPS }).map((_, slotIndex) => {
-            const cupIndex = slotToCup[slotIndex];
+          {/* Render cups by their stable cup index to allow smooth position animation */}
+          {Array.from({ length: NUM_CUPS }).map((_, cupIndex) => {
+            const slotIndex = positions[cupIndex];
             const isLifted = liftedCup === cupIndex;
             const isHidingCharacter = cupIndex === hiddenCupIndex;
 
