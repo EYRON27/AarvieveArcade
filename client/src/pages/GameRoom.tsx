@@ -55,6 +55,8 @@ const GameRoom: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [fsCountdown, setFsCountdown] = useState<number | null>(null);
+  const fsCountdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Music: plays only after game has started and not paused
   useGameMusic(gameId, gameStarted && !isPaused && !showSaveModal);
@@ -94,14 +96,15 @@ const GameRoom: React.FC = () => {
   // Listen for Esc key to exit fullscreen overlay; P to pause/resume
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isFullscreen) setIsFullscreen(false);
-      if (e.key === 'p' || e.key === 'P') {
+      if (e.key === 'Escape' && isFullscreen) enterFullscreenWithCountdown(false);
+      if ((e.key === 'p' || e.key === 'P') && fsCountdown === null) {
         if (gameStarted) setIsPaused(p => !p);
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [isFullscreen, gameStarted]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFullscreen, gameStarted, fsCountdown]);
 
   // Calculate dynamic scale for fullscreen so the game blows up to fill the monitor
   const [fullscreenScale, setFullscreenScale] = useState(1);
@@ -160,7 +163,32 @@ const GameRoom: React.FC = () => {
     setShowSaveModal(false);
     setIsPaused(false);
     setGameStarted(false);
+    setFsCountdown(null);
+    if (fsCountdownRef.current) clearInterval(fsCountdownRef.current);
   }, [gameId]);
+
+  // Helper: pause game and start 3-second countdown, then resume
+  const enterFullscreenWithCountdown = (goFullscreen: boolean) => {
+    if (gameStarted && !isPaused) {
+      setIsFullscreen(goFullscreen);
+      setIsPaused(true);
+      setFsCountdown(3);
+      if (fsCountdownRef.current) clearInterval(fsCountdownRef.current);
+      fsCountdownRef.current = setInterval(() => {
+        setFsCountdown(prev => {
+          if (prev === null || prev <= 1) {
+            clearInterval(fsCountdownRef.current!);
+            fsCountdownRef.current = null;
+            setIsPaused(false);
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      setIsFullscreen(goFullscreen);
+    }
+  };
 
   if (!user || !gameId || !GAME_METRICS[gameId]) {
     return (
@@ -221,73 +249,6 @@ const GameRoom: React.FC = () => {
 
   return (
     <>
-      {/* ── TRUE FULLSCREEN OVERLAY — covers the ENTIRE browser window ── */}
-      {isFullscreen && (
-        <div className="fixed inset-0 z-[9999] bg-slate-950 flex flex-col">
-          {/* Thin top bar with exit button */}
-          <div className="flex items-center justify-between px-6 py-3 bg-slate-900/95 border-b border-slate-800 shrink-0">
-            <span className="font-pixel text-[11px] text-slate-400 uppercase tracking-widest select-none">
-              {meta.icon} {meta.title} — Fullscreen Mode
-            </span>
-            <div className="flex items-center gap-3">
-              {gameStarted && (
-                <button
-                  onClick={() => setIsPaused(p => !p)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-xs font-bold ${
-                    isPaused
-                      ? 'bg-arcade-green/20 hover:bg-arcade-green text-arcade-green hover:text-slate-900 border-arcade-green/50'
-                      : 'bg-slate-800 hover:bg-amber-500 text-slate-300 hover:text-white border-slate-700'
-                  }`}
-                >
-                  {isPaused ? (
-                    <><Play className="w-4 h-4" /> Resume <span className="opacity-50 ml-1">(P)</span></>
-                  ) : (
-                    <><Pause className="w-4 h-4" /> Pause <span className="opacity-50 ml-1">(P)</span></>
-                  )}
-                </button>
-              )}
-              <button
-                onClick={() => setIsFullscreen(false)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-arcade-red text-slate-300 hover:text-white rounded-lg border border-slate-700 transition-all text-xs font-bold"
-              >
-                <Minimize className="w-4 h-4" />
-                Exit <span className="text-slate-500 font-normal ml-1">(Esc)</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Game takes ALL remaining screen height and scales up */}
-          <div className="relative flex-1 flex items-center justify-center overflow-hidden p-6 w-full h-full">
-            {isPaused && (
-              <div className="absolute inset-0 z-40 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center gap-4">
-                <span className="text-6xl">⏸️</span>
-                <h3 className="font-pixel text-lg text-white uppercase tracking-widest mt-2">PAUSED</h3>
-                <button
-                  onClick={() => setIsPaused(false)}
-                  className="flex items-center gap-2 bg-arcade-green hover:bg-emerald-400 text-black font-bold rounded-2xl px-6 py-3 text-sm transition-all mt-4"
-                >
-                  <Play className="w-5 h-5 fill-black" />
-                  RESUME
-                </button>
-              </div>
-            )}
-
-            <div
-              ref={gameWrapperRef}
-              style={{
-                transform: `scale(${fullscreenScale})`,
-                transformOrigin: 'center',
-                transition: 'transform 0.2s ease-out'
-              }}
-            >
-              <Suspense fallback={<LoadingScreen message="Inserting coin cartridges..." />}>
-                {renderGame()}
-              </Suspense>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* ── NORMAL GAME ROOM ── */}
       <div className="relative min-h-screen w-full bg-arcade-darker text-white pb-20 overflow-x-hidden">
         <HeartParticles />
@@ -302,49 +263,117 @@ const GameRoom: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-2 items-start">
             {/* Game container */}
-            <div className="lg:col-span-3 bg-slate-950 border-2 border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative min-h-[480px] flex items-center justify-center p-2 sm:p-4 group">
-              {/* Fullscreen button */}
-              <button
-                onClick={() => setIsFullscreen(true)}
-                className="absolute top-4 right-4 z-50 p-2.5 bg-slate-900/90 hover:bg-arcade-green text-slate-300 hover:text-white rounded-xl backdrop-blur-sm border border-slate-700/50 transition-all shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100"
-                title="Enter Fullscreen"
-              >
-                <Maximize className="w-5 h-5" />
-              </button>
+            <div className={
+              isFullscreen
+                ? "fixed inset-0 z-[9999] bg-slate-950 flex flex-col"
+                : "lg:col-span-3 bg-slate-950 border-2 border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative min-h-[480px] flex items-center justify-center p-2 sm:p-4 group"
+            }>
+              
+              {/* Fullscreen Top Bar */}
+              {isFullscreen && (
+                <div className="flex items-center justify-between px-6 py-3 bg-slate-900/95 border-b border-slate-800 shrink-0 w-full z-50">
+                  <span className="font-pixel text-[11px] text-slate-400 uppercase tracking-widest select-none">
+                    {meta.icon} {meta.title} — Fullscreen Mode
+                  </span>
+                  <div className="flex items-center gap-3">
+                    {gameStarted && (
+                      <button
+                        onClick={() => setIsPaused(p => !p)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-xs font-bold ${
+                          isPaused
+                            ? 'bg-arcade-green/20 hover:bg-arcade-green text-arcade-green hover:text-slate-900 border-arcade-green/50'
+                            : 'bg-slate-800 hover:bg-amber-500 text-slate-300 hover:text-white border-slate-700'
+                        }`}
+                      >
+                        {isPaused ? (
+                          <><Play className="w-4 h-4" /> Resume <span className="opacity-50 ml-1">(P)</span></>
+                        ) : (
+                          <><Pause className="w-4 h-4" /> Pause <span className="opacity-50 ml-1">(P)</span></>
+                        )}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => enterFullscreenWithCountdown(false)}
+                      className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-arcade-red text-slate-300 hover:text-white rounded-lg border border-slate-700 transition-all text-xs font-bold"
+                    >
+                      <Minimize className="w-4 h-4" />
+                      Exit <span className="text-slate-500 font-normal ml-1">(Esc)</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
-              {/* Pause/Resume button — only show when game has started */}
-              {gameStarted && (
-                <button
-                  onClick={() => setIsPaused(p => !p)}
-                  className={`absolute top-4 right-16 z-50 p-2.5 backdrop-blur-sm border rounded-xl transition-all shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 ${isPaused
-                    ? 'bg-arcade-green/20 hover:bg-arcade-green text-arcade-green hover:text-white border-arcade-green/50'
-                    : 'bg-slate-900/90 hover:bg-amber-500 text-slate-300 hover:text-white border-slate-700/50'
-                    }`}
-                  title={isPaused ? 'Resume (P)' : 'Pause (P)'}
-                >
-                  {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
-                </button>
+              {/* Normal Mode Buttons */}
+              {!isFullscreen && (
+                <>
+                  <button
+                    onClick={() => enterFullscreenWithCountdown(true)}
+                    className="absolute top-4 right-4 z-50 p-2.5 bg-slate-900/90 hover:bg-arcade-green text-slate-300 hover:text-white rounded-xl backdrop-blur-sm border border-slate-700/50 transition-all shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100"
+                    title="Enter Fullscreen"
+                  >
+                    <Maximize className="w-5 h-5" />
+                  </button>
+
+                  {gameStarted && (
+                    <button
+                      onClick={() => setIsPaused(p => !p)}
+                      className={`absolute top-4 right-16 z-50 p-2.5 backdrop-blur-sm border rounded-xl transition-all shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 ${isPaused
+                        ? 'bg-arcade-green/20 hover:bg-arcade-green text-arcade-green hover:text-white border-arcade-green/50'
+                        : 'bg-slate-900/90 hover:bg-amber-500 text-slate-300 hover:text-white border-slate-700/50'
+                        }`}
+                      title={isPaused ? 'Resume (P)' : 'Pause (P)'}
+                    >
+                      {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+                    </button>
+                  )}
+                </>
               )}
 
               {/* Paused overlay */}
               {isPaused && (
-                <div className="absolute inset-0 z-40 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center gap-4 rounded-3xl">
-                  <span className="text-5xl">⏸️</span>
-                  <h3 className="font-pixel text-sm text-white uppercase tracking-widest">PAUSED</h3>
-                  <button
-                    onClick={() => setIsPaused(false)}
-                    className="flex items-center gap-2 bg-arcade-green hover:bg-emerald-400 text-black font-bold rounded-2xl px-6 py-3 text-sm transition-all"
-                  >
-                    <Play className="w-4 h-4 fill-black" />
-                    RESUME
-                  </button>
+                <div className={`absolute inset-0 z-40 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center gap-4 ${!isFullscreen ? 'rounded-3xl' : ''}`}>
+                  {fsCountdown !== null ? (
+                    <>
+                      <span className="text-5xl">⏳</span>
+                      <h3 className="font-pixel text-sm text-white uppercase tracking-widest">Resuming in...</h3>
+                      <span
+                        key={fsCountdown}
+                        className="text-7xl font-black text-arcade-green animate-ping-once"
+                        style={{ animation: 'ping-once 0.6s ease-out' }}
+                      >
+                        {fsCountdown}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-5xl">⏸️</span>
+                      <h3 className="font-pixel text-sm text-white uppercase tracking-widest">PAUSED</h3>
+                      <button
+                        onClick={() => setIsPaused(false)}
+                        className="flex items-center gap-2 bg-arcade-green hover:bg-emerald-400 text-black font-bold rounded-2xl px-6 py-3 text-sm transition-all"
+                      >
+                        <Play className="w-4 h-4 fill-black" />
+                        RESUME
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
 
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Suspense fallback={<LoadingScreen message="Inserting coin cartridges..." />}>
-                  {renderGame()}
-                </Suspense>
+              {/* The Game itself */}
+              <div className={isFullscreen ? "relative flex-1 flex items-center justify-center overflow-hidden p-6 w-full h-full" : "absolute inset-0 flex items-center justify-center"}>
+                <div
+                  ref={gameWrapperRef}
+                  style={isFullscreen ? {
+                    transform: `scale(${fullscreenScale})`,
+                    transformOrigin: 'center',
+                    transition: 'transform 0.2s ease-out'
+                  } : {}}
+                >
+                  <Suspense fallback={<LoadingScreen message="Inserting coin cartridges..." />}>
+                    {renderGame()}
+                  </Suspense>
+                </div>
               </div>
             </div>
 
