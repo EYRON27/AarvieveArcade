@@ -59,6 +59,10 @@ interface GameStoreState {
   loadingData:  boolean;
   showConfetti: boolean;
   isGameMusicPlaying: boolean;
+  
+  // PWA Install Prompt State
+  deferredPrompt: any | null;
+  isInstallable: boolean;
 
   toggleMusic:      () => void;
   setActiveGameId:  (gameId: string | null) => void;
@@ -67,6 +71,7 @@ interface GameStoreState {
   fetchInitialData: (userId: string) => Promise<void>;
   saveGameScore:    (userId: string, displayName: string, gameId: string, score: number) => Promise<GameScore>;
   unlockAchievement:(userId: string, achievementId: string) => Promise<void>;
+  setInstallPrompt: (prompt: any) => void;
 }
 
 export const useGameStore = create<GameStoreState>((set, get) => ({
@@ -78,10 +83,13 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   loadingData:  false,
   showConfetti: false,
   isGameMusicPlaying: false,
+  deferredPrompt: null,
+  isInstallable: false,
 
   toggleMusic:     () => set(s => ({ musicEnabled: !s.musicEnabled })),
   setActiveGameId: (gameId) => set({ activeGameId: gameId }),
   setIsGameMusicPlaying: (isPlaying) => set({ isGameMusicPlaying: isPlaying }),
+  setInstallPrompt: (prompt) => set({ deferredPrompt: prompt, isInstallable: prompt !== null }),
 
   triggerConfetti: () => {
     set({ showConfetti: true });

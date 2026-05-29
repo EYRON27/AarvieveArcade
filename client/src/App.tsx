@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider } from './contexts/AuthContext';
+import { useGameStore } from './store/gameStore';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import Navbar from './components/layout/Navbar';
 import ConfettiCanvas from './components/ui/ConfettiCanvas';
@@ -46,6 +47,19 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
 // ──────────────────────────────────────────────────────────────────────────────
 const AppRoutes: React.FC = () => {
   const location = useLocation();
+
+  React.useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      useGameStore.getState().setInstallPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
 
   return (
     <>
