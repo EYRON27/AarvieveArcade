@@ -25,6 +25,7 @@ const WhackABug = lazy(() => import('../games/whackABug/WhackABug'));
 const ReactionGame = lazy(() => import('../games/reactionGame/ReactionGame'));
 const CatchMyHeart = lazy(() => import('../games/catchMyHeart/CatchMyHeart'));
 const RelationshipTrivia = lazy(() => import('../games/coupleGames/RelationshipTrivia'));
+const CupShuffle = lazy(() => import('../games/cupShuffle/CupShuffle'));
 
 const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }> = {
   flappyBird: { title: 'Flappy Bird', desc: 'Navigate through obstacles without crashing.', icon: '🦅' },
@@ -39,7 +40,8 @@ const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }
   whackABug: { title: 'Whack-A-Bug', desc: 'Smash as many bugs as you can in 30s.', icon: '🐛' },
   reactionGame: { title: 'Reaction Clicker', desc: 'Click the target instantly — test your reflex.', icon: '⚡' },
   catchMyHeart: { title: 'Catch My Heart', desc: 'Catch falling hearts with your basket.', icon: '🧺' },
-  relationshipTrivia: { title: 'Arcade Trivia', desc: 'Test your gaming knowledge — 5 questions.', icon: '🎯' }
+  relationshipTrivia: { title: 'Arcade Trivia', desc: 'Test your gaming knowledge — 5 questions.', icon: '🎯' },
+  cupShuffle: { title: 'Cup Shuffle', desc: 'Follow the shuffle and find where Pou is hiding!', icon: '🥤' }
 };
 
 const GameRoom: React.FC = () => {
@@ -212,6 +214,7 @@ const GameRoom: React.FC = () => {
       case 'reactionGame': return <ReactionGame onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
       case 'catchMyHeart': return <CatchMyHeart onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
       case 'relationshipTrivia': return <RelationshipTrivia onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'cupShuffle': return <CupShuffle onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
       default: return <div>Game under maintenance</div>;
     }
   };
@@ -226,17 +229,49 @@ const GameRoom: React.FC = () => {
             <span className="font-pixel text-[11px] text-slate-400 uppercase tracking-widest select-none">
               {meta.icon} {meta.title} — Fullscreen Mode
             </span>
-            <button
-              onClick={() => setIsFullscreen(false)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-arcade-red text-slate-300 hover:text-white rounded-lg border border-slate-700 transition-all text-xs font-bold"
-            >
-              <Minimize className="w-4 h-4" />
-              Exit <span className="text-slate-500 font-normal ml-1">(Esc)</span>
-            </button>
+            <div className="flex items-center gap-3">
+              {gameStarted && (
+                <button
+                  onClick={() => setIsPaused(p => !p)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-xs font-bold ${
+                    isPaused
+                      ? 'bg-arcade-green/20 hover:bg-arcade-green text-arcade-green hover:text-slate-900 border-arcade-green/50'
+                      : 'bg-slate-800 hover:bg-amber-500 text-slate-300 hover:text-white border-slate-700'
+                  }`}
+                >
+                  {isPaused ? (
+                    <><Play className="w-4 h-4" /> Resume <span className="opacity-50 ml-1">(P)</span></>
+                  ) : (
+                    <><Pause className="w-4 h-4" /> Pause <span className="opacity-50 ml-1">(P)</span></>
+                  )}
+                </button>
+              )}
+              <button
+                onClick={() => setIsFullscreen(false)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-arcade-red text-slate-300 hover:text-white rounded-lg border border-slate-700 transition-all text-xs font-bold"
+              >
+                <Minimize className="w-4 h-4" />
+                Exit <span className="text-slate-500 font-normal ml-1">(Esc)</span>
+              </button>
+            </div>
           </div>
 
           {/* Game takes ALL remaining screen height and scales up */}
-          <div className="flex-1 flex items-center justify-center overflow-hidden p-6 w-full h-full">
+          <div className="relative flex-1 flex items-center justify-center overflow-hidden p-6 w-full h-full">
+            {isPaused && (
+              <div className="absolute inset-0 z-40 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center gap-4">
+                <span className="text-6xl">⏸️</span>
+                <h3 className="font-pixel text-lg text-white uppercase tracking-widest mt-2">PAUSED</h3>
+                <button
+                  onClick={() => setIsPaused(false)}
+                  className="flex items-center gap-2 bg-arcade-green hover:bg-emerald-400 text-black font-bold rounded-2xl px-6 py-3 text-sm transition-all mt-4"
+                >
+                  <Play className="w-5 h-5 fill-black" />
+                  RESUME
+                </button>
+              </div>
+            )}
+
             <div
               ref={gameWrapperRef}
               style={{

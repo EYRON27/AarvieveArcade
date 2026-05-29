@@ -23,6 +23,7 @@ const ALL_ACHIEVEMENTS: Achievement[] = [
   { id: 'lightning',       title: 'Lightning Reflex',         description: 'Get a reaction time under 250ms.',                      icon: '⚡', points: 25, isUnlocked: false, category: 'gaming'  },
   { id: 'heart_hunter',    title: 'Heart Hunter',             description: 'Catch 50 hearts in Catch My Heart.',                    icon: '🧺', points: 30, isUnlocked: false, category: 'gaming'  },
   { id: 'trivia_master',   title: 'Trivia Master',            description: 'Score 100/100 in Arcade Trivia.',                       icon: '👑', points: 50, isUnlocked: false, category: 'gaming'  },
+  { id: 'cup_hustler',     title: 'Cup Hustler',              description: 'Get a perfect score (8/8) in Cup Shuffle.',             icon: '🥤', points: 40, isUnlocked: false, category: 'gaming'  },
   { id: 'perfectionist',   title: 'Perfectionist',            description: 'Achieve a personal best in any 3 different games.',     icon: '🏅', points: 35, isUnlocked: false, category: 'special' },
   { id: 'high_roller',     title: 'High Roller',              description: 'Accumulate 200 total points across all games.',         icon: '🎰', points: 50, isUnlocked: false, category: 'special' },
 ];
@@ -42,11 +43,12 @@ const ALL_GALLERY: GalleryItem[] = [
   { id: 'lightning',       title: 'Lightning Reflex ⚡',      description: 'A striking neon lightning bolt symbolizing fast reflexes.', imageUrl: '/gallery/gallery_lightning_1779587291181.png', unlockCondition: 'Unlock: Get a reaction time under 250ms.', isUnlocked: false },
   { id: 'heart_hunter',    title: 'Heart Hunter 🧺',          description: 'A pixel art basket catching falling glowing pink hearts.', imageUrl: '/gallery/gallery_heart_1779587303712.png', unlockCondition: 'Unlock: Catch 50 hearts in Catch My Heart.', isUnlocked: false },
   { id: 'trivia_master',   title: 'Trivia Master 👑',         description: 'A retro game show buzzer and trivia screen.', imageUrl: '/gallery/gallery_trivia_1779587318765.png', unlockCondition: 'Unlock: Score 100/100 in Arcade Trivia.', isUnlocked: false },
+  { id: 'cup_hustler',     title: 'Cup Hustler 🥤',           description: 'Three neon cups shuffling at high speed.', imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=CupShuffle&backgroundColor=1a1a1a', unlockCondition: 'Unlock: Get a perfect score (8/8) in Cup Shuffle.', isUnlocked: false },
   { id: 'perfectionist',   title: 'Perfectionist 🏅',         description: 'Three golden arcade medals glowing on a pedestal.', imageUrl: '/gallery/gallery_perfectionist_1779587335652.png', unlockCondition: 'Unlock: Achieve a personal best in any 3 different games.', isUnlocked: false },
   { id: 'high_roller',     title: 'High Roller 🎰',           description: 'A retro arcade slot machine hitting a jackpot.', imageUrl: '/gallery/gallery_highroller_1779587350225.png', unlockCondition: 'Unlock: Accumulate 200 total points across all games.', isUnlocked: false },
 ];
 
-const ALL_GAME_IDS = ['flappyBird', 'snake', 'ticTacToe', 'memoryGame', 'puzzle2048', 'sudoku', 'neonSequence', 'spaceDodger', 'brickBreaker', 'whackABug', 'reactionGame', 'catchMyHeart', 'relationshipTrivia'];
+const ALL_GAME_IDS = ['flappyBird', 'snake', 'ticTacToe', 'memoryGame', 'puzzle2048', 'sudoku', 'neonSequence', 'spaceDodger', 'brickBreaker', 'whackABug', 'reactionGame', 'catchMyHeart', 'relationshipTrivia', 'cupShuffle'];
 
 interface GameStoreState {
   achievements: Achievement[];
@@ -115,14 +117,11 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         unlockedAt: unlockedIds.includes(a.id) ? (userDoc.data()?.achievementDates?.[a.id] || undefined) : undefined,
       }));
 
-      // 3. Gallery unlocks based on achievements
-      const mergedGallery = ALL_GALLERY.map(g => {
-        const unlocked =
-          (g.id === 'pixel_city'    && unlockedIds.includes('flappy_pro'))   ||
-          (g.id === 'retro_lab'     && unlockedIds.includes('tic_winner'))    ||
-          (g.id === 'hall_of_fame'  && (unlockedIds.includes('snake_century') || unlockedIds.length >= 5));
-        return { ...g, isUnlocked: unlocked };
-      });
+      // 3. Gallery unlocks based on achievements (1:1 mapping with achievement IDs)
+      const mergedGallery = ALL_GALLERY.map(g => ({
+        ...g,
+        isUnlocked: unlockedIds.includes(g.id)
+      }));
 
       // 4. Fetch all scores from Firestore in parallel — simple where only (no index needed)
       const scorePromises = ALL_GAME_IDS.map(gId =>
@@ -198,6 +197,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       if (gameId === 'reactionGame'       && score < 250)  unlock('lightning');
       if (gameId === 'catchMyHeart'       && score >= 50)  unlock('heart_hunter');
       if (gameId === 'relationshipTrivia' && score >= 100) unlock('trivia_master');
+      if (gameId === 'cupShuffle'         && score >= 8)   unlock('cup_hustler');
 
       // Perfectionist: personal best in 3+ different games
       const allScores = { ...updatedScores };

@@ -42,14 +42,20 @@ const CatchMyHeart: React.FC<CatchMyHeartProps> = ({ onComplete, onStart, isPaus
     if (e.code === 'ArrowRight') physicsRef.current.keys.ArrowRight = false;
   };
 
-  // Mouse / Touch movements
-  const handleMouseMove = (e: MouseEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas || gameState !== 'playing') return;
+  // Pointer movements (Mouse + Touch)
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (gameState !== 'playing' || !canvasRef.current) return;
     
-    const rect = canvas.getBoundingClientRect();
-    const relativeX = e.clientX - rect.left;
-    physicsRef.current.basketX = Math.max(0, Math.min(canvas.width - physicsRef.current.basketWidth, relativeX - physicsRef.current.basketWidth / 2));
+    // Allow touch dragging without requiring click (for touchscreens)
+    if (e.pointerType === 'mouse' && e.buttons !== 1) {
+      // If using mouse, maybe don't require clicking, or do? Let's just follow the mouse.
+    }
+    
+    const rect = canvasRef.current.getBoundingClientRect();
+    const scaleX = canvasRef.current.width / rect.width;
+    const relativeX = (e.clientX - rect.left) * scaleX;
+    
+    physicsRef.current.basketX = Math.max(0, Math.min(canvasRef.current.width - physicsRef.current.basketWidth, relativeX - physicsRef.current.basketWidth / 2));
   };
 
   useEffect(() => {
@@ -197,11 +203,9 @@ const CatchMyHeart: React.FC<CatchMyHeartProps> = ({ onComplete, onStart, isPaus
       frameId = requestAnimationFrame(render);
     };
 
-    canvas.addEventListener('mousemove', handleMouseMove);
     render();
 
     return () => {
-      canvas.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(frameId);
     };
   }, [gameState, isPaused]);
@@ -221,7 +225,13 @@ const CatchMyHeart: React.FC<CatchMyHeartProps> = ({ onComplete, onStart, isPaus
   return (
     <div ref={containerRef} className="w-full flex flex-col items-center select-none">
       <div className="relative border-4 border-slate-800 rounded-3xl overflow-hidden bg-slate-950 shadow-inner">
-        <canvas ref={canvasRef} className="block cursor-crosshair" />
+        <canvas 
+          ref={canvasRef} 
+          className="block cursor-crosshair touch-none" 
+          onPointerMove={handlePointerMove}
+          onPointerDown={handlePointerMove}
+          style={{ touchAction: 'none' }}
+        />
 
         {/* HUD overlay */}
         <div className="absolute top-4 left-4 font-pixel tracking-widest text-slate-100 bg-slate-950/80 border border-slate-800 rounded-2xl px-4 py-2 text-xs z-20 flex items-center gap-1 select-none">

@@ -19,6 +19,7 @@ const GAME_LABELS: Record<string, { label: string; icon: string }> = {
   reactionGame:       { label: 'Reaction Clicker',  icon: '⚡' },
   catchMyHeart:       { label: 'Catch My Heart',    icon: '🧺' },
   relationshipTrivia: { label: 'Arcade Trivia',     icon: '🎯' },
+  cupShuffle:         { label: 'Cup Shuffle',       icon: '🥤' },
 };
 
 const Leaderboard: React.FC = () => {
@@ -111,9 +112,11 @@ const Leaderboard: React.FC = () => {
                         <td className="px-5 py-3.5">
                           <div className="flex items-center gap-2.5">
                             <img
-                              src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${entry.userDisplayName}&backgroundColor=1a1a1a`}
+                              src={isMe && user?.avatarUrl 
+                                ? user.avatarUrl 
+                                : (entry.userAvatarUrl || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${entry.userDisplayName}&backgroundColor=1a1a1a`)}
                               alt=""
-                              className="w-6 h-6 rounded-md border border-white/8 bg-arcade-dark"
+                              className="w-6 h-6 rounded-md border border-white/8 bg-arcade-dark object-cover"
                             />
                             <span className="font-semibold text-slate-200">{entry.userDisplayName}</span>
                             {isMe && (

@@ -67,6 +67,18 @@ const SpaceDodger: React.FC<SpaceDodgerProps> = ({ onComplete, onStart, isPaused
     };
   }, []);
 
+  // Pointer movements (Mouse + Touch)
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (gameState !== 'playing' || !canvasRef.current) return;
+    
+    // We want the player to just follow the pointer's X coordinate
+    const rect = canvasRef.current.getBoundingClientRect();
+    const scaleX = canvasRef.current.width / rect.width;
+    const relativeX = (e.clientX - rect.left) * scaleX;
+    
+    physicsRef.current.playerX = Math.max(physicsRef.current.playerWidth / 2, Math.min(canvasRef.current.width - physicsRef.current.playerWidth / 2, relativeX));
+  };
+
   // Responsive canvas sizing
   useEffect(() => {
     const handleResize = () => {
@@ -245,7 +257,13 @@ const SpaceDodger: React.FC<SpaceDodgerProps> = ({ onComplete, onStart, isPaused
       </div>
 
       <div className="relative border-4 border-slate-800 rounded-3xl overflow-hidden bg-slate-950 shadow-[0_0_50px_rgba(56,189,248,0.1)]">
-        <canvas ref={canvasRef} className="block" />
+        <canvas 
+          ref={canvasRef} 
+          className="block touch-none" 
+          onPointerMove={handlePointerMove}
+          onPointerDown={handlePointerMove}
+          style={{ touchAction: 'none' }}
+        />
 
         {/* Start Screen */}
         {gameState === 'idle' && (
