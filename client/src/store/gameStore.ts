@@ -59,6 +59,10 @@ interface GameStoreState {
   loadingData:  boolean;
   showConfetti: boolean;
   isGameMusicPlaying: boolean;
+  
+  // PWA Install Prompt State
+  deferredPrompt: any | null;
+  isInstallable: boolean;
 
   toggleMusic:      () => void;
   setActiveGameId:  (gameId: string | null) => void;
@@ -67,6 +71,7 @@ interface GameStoreState {
   fetchInitialData: (userId: string) => Promise<void>;
   saveGameScore:    (userId: string, displayName: string, gameId: string, score: number) => Promise<GameScore>;
   unlockAchievement:(userId: string, achievementId: string) => Promise<void>;
+  setInstallPrompt: (prompt: any) => void;
 }
 
 export const useGameStore = create<GameStoreState>((set, get) => ({
@@ -78,10 +83,13 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   loadingData:  false,
   showConfetti: false,
   isGameMusicPlaying: false,
+  deferredPrompt: null,
+  isInstallable: false,
 
   toggleMusic:     () => set(s => ({ musicEnabled: !s.musicEnabled })),
   setActiveGameId: (gameId) => set({ activeGameId: gameId }),
   setIsGameMusicPlaying: (isPlaying) => set({ isGameMusicPlaying: isPlaying }),
+  setInstallPrompt: (prompt) => set({ deferredPrompt: prompt, isInstallable: prompt !== null }),
 
   triggerConfetti: () => {
     set({ showConfetti: true });
@@ -132,7 +140,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
           gId,
           scores: snap.docs
             .map(d => ({ id: d.id, ...d.data() } as GameScore))
-            .sort((a, b) => (gId === 'reactionGame' || gId === 'memoryGame') ? a.score - b.score : b.score - a.score)
+            .sort((a, b) => (gId === 'reactionGame') ? a.score - b.score : b.score - a.score)
             .slice(0, 10) // top 10 client-side
         }))
       );
@@ -177,7 +185,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       // Update local scores immediately (no need to refetch)
       const updatedScores = { ...get().scores };
       const list = [...(updatedScores[gameId] || []), { id: ref.id, ...data }]
-        .sort((a, b) => (gameId === 'reactionGame' || gameId === 'memoryGame') ? a.score - b.score : b.score - a.score)
+        .sort((a, b) => (gameId === 'reactionGame') ? a.score - b.score : b.score - a.score)
         .slice(0, 10);
       updatedScores[gameId] = list;
       set({ scores: updatedScores });

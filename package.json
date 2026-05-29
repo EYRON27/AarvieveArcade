@@ -2,9 +2,7 @@
   "name": "aarvieve-arcade",
   "private": true,
   "workspaces": [
-    "client",
-    "server",
-    "shared"
+    "client"
   ],
   "scripts": {
     "dev": "npm run client:dev",

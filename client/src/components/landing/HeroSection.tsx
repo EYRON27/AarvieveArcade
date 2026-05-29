@@ -1,30 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronDown, Play, Download } from 'lucide-react';
+import { useGameStore } from '../../store/gameStore';
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setIsInstallable(true);
-    };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, []);
+  const { deferredPrompt, setInstallPrompt } = useGameStore();
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      alert("The app is already installed, or your browser requires you to install it manually via the menu (e.g. 'Add to Home Screen').");
+      return;
+    }
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') setIsInstallable(false);
-    setDeferredPrompt(null);
+    if (outcome === 'accepted') setInstallPrompt(null);
   };
 
   return (
@@ -96,23 +87,21 @@ const HeroSection: React.FC = () => {
           </button>
         </motion.div>
 
-        {/* Install App Button — only visible if browser supports PWA install */}
-        {isInstallable && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="mt-6 w-full max-w-md"
+        {/* Install App Button — always visible */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 w-full max-w-md"
+        >
+          <button
+            onClick={handleInstall}
+            className="w-full flex items-center justify-center gap-2.5 border border-arcade-blue/50 bg-arcade-blue/10 hover:bg-arcade-blue/20 text-arcade-blue font-bold rounded-2xl py-3.5 text-sm tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] hover:-translate-y-0.5 animate-pulse hover:animate-none"
           >
-            <button
-              onClick={handleInstall}
-              className="w-full flex items-center justify-center gap-2.5 border border-arcade-blue/50 bg-arcade-blue/10 hover:bg-arcade-blue/20 text-arcade-blue font-bold rounded-2xl py-3.5 text-sm tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] hover:-translate-y-0.5 animate-pulse hover:animate-none"
-            >
-              <Download className="w-4 h-4" />
-              <span>Install App — Play Offline</span>
-            </button>
-          </motion.div>
-        )}
+            <Download className="w-4 h-4" />
+            <span>Install App — Play Offline</span>
+          </button>
+        </motion.div>
       </div>
 
       {/* Scroll indicator */}
