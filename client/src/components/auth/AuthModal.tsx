@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useGameStore } from '../../store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, LogIn, UserPlus, Eye, EyeOff, User as UserIcon, X } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User as UserIcon, X } from 'lucide-react';
 import LoadingScreen from '../ui/LoadingScreen';
 
 const AuthModal: React.FC = () => {

@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useGameStore } from '../store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { GalleryItem } from '../types';
-import { Image, ArrowLeft, Lock, Eye, X, Trophy } from 'lucide-react';
+import { Image, Lock, Eye, X, Trophy } from 'lucide-react';
 
 const Memories: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { gallery } = useGameStore();
   const [activeItem, setActiveItem] = useState<GalleryItem | null>(null);

@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useGameStore } from '../store/gameStore';
 
-import { Trophy, ArrowLeft, Calendar, Target } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Trophy, Calendar, Target } from 'lucide-react';
 
 const GAME_LABELS: Record<string, { label: string; icon: string }> = {
   flappyBird:         { label: 'Flappy Bird',      icon: '🐦' },
@@ -24,7 +23,6 @@ const GAME_LABELS: Record<string, { label: string; icon: string }> = {
 
 const Leaderboard: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { scores } = useGameStore();
   const [activeGame, setActiveGame] = useState<string>('flappyBird');
 

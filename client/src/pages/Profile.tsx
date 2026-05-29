@@ -1,15 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { User, Save, ArrowLeft, Image as ImageIcon, Upload } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-
+import { User, Save, Image as ImageIcon, Upload } from 'lucide-react';
 
 const AVATAR_SEEDS = ['Alpha', 'Bravo', 'Delta', 'Echo', 'Foxtrot', 'Gamer', 'Pixel', 'Retro'];
 
 const Profile: React.FC = () => {
   const { user, updateProfile } = useAuth();
-  const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [avatarSeed,  setAvatarSeed]  = useState('');

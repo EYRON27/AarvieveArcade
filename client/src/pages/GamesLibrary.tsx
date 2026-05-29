@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Gamepad2, ArrowLeft, Clock, Star, Heart, Zap } from 'lucide-react';
+import { Gamepad2, Clock, Star, Heart, Zap } from 'lucide-react';
 
 interface GameItem {
   id: string;

@@ -1,12 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useGameStore } from '../store/gameStore';
 import { motion } from 'framer-motion';
-import { Award, ArrowLeft, Lock, Calendar, CheckCircle } from 'lucide-react';
+import { Award, Lock, Calendar, CheckCircle } from 'lucide-react';
 
 const Achievements: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { achievements } = useGameStore();
 
