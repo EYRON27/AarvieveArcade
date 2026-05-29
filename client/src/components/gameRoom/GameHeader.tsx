@@ -1,6 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, Trophy } from 'lucide-react';
+import { Star, Trophy } from 'lucide-react';
 
 interface GameHeaderProps {
   meta: { title: string; desc: string; icon: string };
@@ -9,8 +8,6 @@ interface GameHeaderProps {
 }
 
 const GameHeader: React.FC<GameHeaderProps> = ({ meta, personalBest, topScore }) => {
-  const navigate = useNavigate();
-
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
       <div className="text-left flex items-start gap-3">
