@@ -133,7 +133,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
   };
 
   return (
-    <div className="w-full max-w-sm flex flex-col items-center select-none py-4 px-2">
+    <div className="w-full flex flex-col items-center select-none py-4 px-2">
 
       {gameState === 'idle' && (
         <div className="flex flex-col items-center justify-center text-center py-10">
@@ -152,18 +152,19 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
       )}
 
       {gameState !== 'idle' && (
-        <div className="flex flex-col items-center gap-6 w-full">
-          <div className="flex flex-col sm:flex-row items-center justify-between w-full bg-slate-900/60 border border-slate-800 rounded-2xl py-2 px-5 text-sm font-bold text-slate-300">
-            <span className="text-arcade-red">Level {level}</span>
-            <span>Pairs: {cards.filter(c => c.isMatched).length / 2} / 6</span>
-            <span>Score: <span className="text-arcade-yellow">{score}</span></span>
-            <span className={`font-mono ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-arcade-green'}`}>
+        <div className="flex flex-col items-center gap-4 w-full">
+          {/* Stats bar — wraps into 2×2 grid on small screens */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-row sm:items-center sm:justify-between w-full bg-slate-900/60 border border-slate-800 rounded-2xl py-2.5 px-4 gap-2 text-sm font-bold text-slate-300">
+            <span className="text-arcade-red text-center sm:text-left">Level {level}</span>
+            <span className="text-center sm:text-left">Pairs: {cards.filter(c => c.isMatched).length / 2} / 6</span>
+            <span className="text-center sm:text-left">Score: <span className="text-arcade-yellow">{score}</span></span>
+            <span className={`font-mono text-center sm:text-left ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-arcade-green'}`}>
               Time: {timeLeft}s
             </span>
           </div>
 
-          {/* Cards Grid */}
-          <div className="grid grid-cols-3 gap-3.5 bg-slate-900/40 border border-slate-800 rounded-3xl p-4.5 w-full aspect-square">
+          {/* Cards Grid — fills full width, square cells */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3.5 bg-slate-900/40 border border-slate-800 rounded-3xl p-3 sm:p-4 w-full">
             {cards.map((card, idx) => {
               const showSymbol = card.isFlipped || card.isMatched;
 
@@ -171,18 +172,18 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
                 <div
                   key={card.id}
                   onClick={() => handleCardClick(idx)}
-                  className="relative w-full aspect-square cursor-pointer preserve-3d"
-                  style={{ perspective: '1000px' }}
+                  className="relative w-full cursor-pointer"
+                  style={{ perspective: '1000px', aspectRatio: '1 / 1' }}
                 >
                   <motion.div
                     animate={{ rotateY: showSymbol ? 180 : 0 }}
                     transition={{ duration: 0.35, ease: "easeInOut" }}
-                    className="relative w-full h-full rounded-2xl preserve-3d shadow-lg"
+                    className="relative w-full h-full rounded-2xl shadow-lg"
                     style={{ transformStyle: 'preserve-3d' }}
                   >
                     {/* Front of card (Question Mark) */}
                     <div 
-                      className="absolute inset-0 w-full h-full rounded-2xl flex items-center justify-center backface-hidden"
+                      className="absolute inset-0 w-full h-full rounded-2xl flex items-center justify-center"
                       style={{
                         backgroundColor: '#1e1b4b',
                         border: '2px solid rgba(253, 230, 138, 0.15)',
@@ -190,12 +191,12 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
                         WebkitBackfaceVisibility: 'hidden'
                       }}
                     >
-                      <span className="text-3xl text-arcade-green/60">❓</span>
+                      <span style={{ fontSize: 'clamp(1.25rem, 6vw, 2rem)' }} className="text-arcade-green/60">❓</span>
                     </div>
 
                     {/* Back of card (Symbol) */}
                     <div 
-                      className="absolute inset-0 w-full h-full rounded-2xl flex items-center justify-center backface-hidden"
+                      className="absolute inset-0 w-full h-full rounded-2xl flex items-center justify-center"
                       style={{
                         backgroundColor: '#0d0a1e',
                         border: '2px solid rgba(253, 230, 138, 0.5)',
@@ -204,7 +205,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onComplete, onStart, isPaused =
                         WebkitBackfaceVisibility: 'hidden'
                       }}
                     >
-                      <span className="text-4xl">{card.symbol}</span>
+                      <span style={{ fontSize: 'clamp(1.5rem, 7vw, 2.5rem)' }}>{card.symbol}</span>
                     </div>
                   </motion.div>
                 </div>
