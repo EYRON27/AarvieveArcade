@@ -36,12 +36,6 @@ const Leaderboard: React.FC = () => {
 
         {/* Header */}
         <div>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-300 uppercase tracking-widest mb-2 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" /> Dashboard
-          </button>
           <h1 className="text-2xl font-bold flex items-center gap-2 text-white">
             <Trophy className="w-6 h-6 text-arcade-green" />
             Global Leaderboards

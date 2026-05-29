@@ -24,12 +24,6 @@ const Memories: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-300 uppercase tracking-widest mb-2 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" /> Dashboard
-            </button>
             <h1 className="text-2xl font-bold flex items-center gap-2 text-white">
               <Image className="w-5 h-5 text-arcade-blue" /> Unlockable Gallery
             </h1>

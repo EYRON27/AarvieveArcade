@@ -14,12 +14,6 @@ const GameHeader: React.FC<GameHeaderProps> = ({ meta, personalBest, topScore })
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
       <div className="text-left flex items-start gap-3">
-        <button
-          onClick={() => navigate('/games')}
-          className="mt-1.5 p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-arcade-red text-slate-400 hover:text-white transition-all cursor-pointer"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide flex items-center gap-2">
             <span className="text-3xl select-none">{meta.icon}</span>
