@@ -379,6 +379,13 @@ const GameRoom: React.FC = () => {
                   </Suspense>
                 </div>
               </div>
+              <GameOverModal
+                showSaveModal={showSaveModal}
+                lastScore={lastScore}
+                scoreSaved={scoreSaved}
+                handleSaveScore={handleSaveScore}
+                setShowSaveModal={setShowSaveModal}
+              />
             </div>
 
             <LeaderboardSidebar
@@ -387,14 +394,6 @@ const GameRoom: React.FC = () => {
             />
           </div>
         </div>
-
-        <GameOverModal
-          showSaveModal={showSaveModal}
-          lastScore={lastScore}
-          scoreSaved={scoreSaved}
-          handleSaveScore={handleSaveScore}
-          setShowSaveModal={setShowSaveModal}
-        />
       </div>
     </>
   );
