@@ -159,10 +159,7 @@ const CupShuffle: React.FC<CupShuffleProps> = ({ onComplete, onStart, isPaused =
   // ── Compute slot → cup mapping for rendering ─────────────────────────────────
   // positions[cupIndex] = slotIndex
   // slotToCup[slotIndex] = cupIndex
-  const slotToCup = positions.reduce<number[]>((acc, slot, cup) => {
-    acc[slot] = cup;
-    return acc;
-  }, new Array(NUM_CUPS).fill(0));
+
 
   const isShuffling = phase === 'shuffle';
   const isGuessable = phase === 'guess';

@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "dev": "npm run client:dev",
+    "build": "npm run client:build",
     "client:dev": "npm run dev --workspace=client",
     "client:build": "npm run build --workspace=client",
     "client:preview": "npm run preview --workspace=client"
