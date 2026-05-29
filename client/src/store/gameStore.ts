@@ -64,6 +64,10 @@ interface GameStoreState {
   deferredPrompt: any | null;
   isInstallable: boolean;
 
+  // Auth Modal State
+  isAuthModalOpen: boolean;
+  authModalView: 'login' | 'register';
+
   toggleMusic:      () => void;
   setActiveGameId:  (gameId: string | null) => void;
   setIsGameMusicPlaying: (isPlaying: boolean) => void;
@@ -72,6 +76,8 @@ interface GameStoreState {
   saveGameScore:    (userId: string, displayName: string, gameId: string, score: number) => Promise<GameScore>;
   unlockAchievement:(userId: string, achievementId: string) => Promise<void>;
   setInstallPrompt: (prompt: any) => void;
+  openAuthModal:    (view: 'login' | 'register') => void;
+  closeAuthModal:   () => void;
 }
 
 export const useGameStore = create<GameStoreState>((set, get) => ({
@@ -85,11 +91,15 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   isGameMusicPlaying: false,
   deferredPrompt: null,
   isInstallable: false,
+  isAuthModalOpen: false,
+  authModalView: 'login',
 
   toggleMusic:     () => set(s => ({ musicEnabled: !s.musicEnabled })),
   setActiveGameId: (gameId) => set({ activeGameId: gameId }),
   setIsGameMusicPlaying: (isPlaying) => set({ isGameMusicPlaying: isPlaying }),
   setInstallPrompt: (prompt) => set({ deferredPrompt: prompt, isInstallable: prompt !== null }),
+  openAuthModal:    (view) => set({ isAuthModalOpen: true, authModalView: view }),
+  closeAuthModal:   () => set({ isAuthModalOpen: false }),
 
   triggerConfetti: () => {
     set({ showConfetti: true });

@@ -5,8 +5,7 @@ import { ChevronDown, Play, Download } from 'lucide-react';
 import { useGameStore } from '../../store/gameStore';
 
 const HeroSection: React.FC = () => {
-  const navigate = useNavigate();
-  const { deferredPrompt, setInstallPrompt } = useGameStore();
+  const { deferredPrompt, setInstallPrompt, openAuthModal } = useGameStore();
 
   const handleInstall = async () => {
     if (!deferredPrompt) {
@@ -70,7 +69,7 @@ const HeroSection: React.FC = () => {
           className="flex flex-col sm:flex-row gap-4 w-full max-w-md"
         >
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => openAuthModal('login')}
             className="flex-1 group relative bg-arcade-red hover:bg-red-500 text-white font-bold rounded-2xl py-4 text-sm tracking-widest uppercase transition-all shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:shadow-[0_0_50px_rgba(239,68,68,0.5)] hover:-translate-y-1"
           >
             <div className="absolute inset-0 w-full h-full border-2 border-white/20 rounded-2xl" />
@@ -80,7 +79,7 @@ const HeroSection: React.FC = () => {
             </div>
           </button>
           <button
-            onClick={() => navigate('/register')}
+            onClick={() => openAuthModal('register')}
             className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/30 text-white font-bold rounded-2xl py-4 text-sm tracking-widest uppercase transition-all backdrop-blur-md"
           >
             New Player

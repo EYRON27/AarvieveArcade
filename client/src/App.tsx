@@ -7,12 +7,12 @@ import ProtectedRoute from './components/layout/ProtectedRoute';
 import Navbar from './components/layout/Navbar';
 import ConfettiCanvas from './components/ui/ConfettiCanvas';
 import LoadingScreen from './components/ui/LoadingScreen';
+import AuthModal from './components/auth/AuthModal';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Lazy-loaded pages for code splitting
 // ──────────────────────────────────────────────────────────────────────────────
 const LandingPage       = lazy(() => import('./pages/LandingPage'));
-const AuthPage          = lazy(() => import('./pages/AuthPage'));
 const Dashboard         = lazy(() => import('./pages/Dashboard'));
 const GamesLibrary      = lazy(() => import('./pages/GamesLibrary'));
 const GameRoom          = lazy(() => import('./pages/GameRoom'));
@@ -69,6 +69,9 @@ const AppRoutes: React.FC = () => {
       {/* Sticky Navbar — hidden on public pages */}
       <Navbar />
 
+      {/* Auth Modal */}
+      <AuthModal />
+
       {/* Animated page transitions */}
       <AnimatePresence mode="wait">
         <Suspense fallback={<LoadingScreen message="Loading arcade room..." />}>
@@ -83,22 +86,7 @@ const AppRoutes: React.FC = () => {
                 </PageTransition>
               }
             />
-            <Route
-              path="/login"
-              element={
-                <PageTransition>
-                  <AuthPage />
-                </PageTransition>
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <PageTransition>
-                  <AuthPage />
-                </PageTransition>
-              }
-            />
+
 
             {/* ── Protected Routes ────────────────────────────────────── */}
             <Route
