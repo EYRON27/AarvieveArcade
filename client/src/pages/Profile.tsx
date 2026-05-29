@@ -3,8 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { User, Save, ArrowLeft, Image as ImageIcon, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { storage, isMockFirebase } from '../services/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 
 const AVATAR_SEEDS = ['Alpha', 'Bravo', 'Delta', 'Echo', 'Foxtrot', 'Gamer', 'Pixel', 'Retro'];
 
