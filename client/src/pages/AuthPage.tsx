@@ -105,14 +105,14 @@ const AuthPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-arcade-darker px-4 py-8 overflow-y-auto">
+    <div className="min-h-[100dvh] flex flex-col items-center bg-arcade-darker px-4 pt-12 pb-48 sm:py-8 sm:justify-center overflow-y-auto">
       {/* Grid */}
       <div className="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:40px_40px] pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 w-full max-w-sm my-auto shrink-0"
+        className="relative z-10 w-full max-w-sm shrink-0 mt-4 sm:mt-0"
       >
         {/* Header */}
         <div className="text-center mb-6">
