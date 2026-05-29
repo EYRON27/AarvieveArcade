@@ -31,28 +31,32 @@ const Navbar: React.FC = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   // Track if PWA is installed: ONLY true when running as a standalone app, not just in a browser
-  const [isInstalled, setIsInstalled] = useState(() => {
-    // Running as installed PWA (not in a regular browser tab)
-    return window.matchMedia('(display-mode: standalone)').matches ||
-      (navigator as any).standalone === true;
-  });
+  const [isInstalled, setIsInstalled] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Listen for display-mode changes (e.g. user installs and reopens as app)
-    const mqStandalone = window.matchMedia('(display-mode: standalone)');
-    const handleMqChange = (e: MediaQueryListEvent) => setIsInstalled(e.matches);
-    mqStandalone.addEventListener('change', handleMqChange);
+    // Safe check: only runs in browser after mount
+    try {
+      const mqStandalone = window.matchMedia('(display-mode: standalone)');
+      // Set initial value
+      setIsInstalled(mqStandalone.matches || (navigator as any).standalone === true);
 
-    // Listen for the app being freshly installed in this session
-    const handleAppInstalled = () => setIsInstalled(true);
-    window.addEventListener('appinstalled', handleAppInstalled);
+      // Listen for display-mode changes
+      const handleMqChange = (e: MediaQueryListEvent) => setIsInstalled(e.matches);
+      mqStandalone.addEventListener('change', handleMqChange);
 
-    return () => {
-      mqStandalone.removeEventListener('change', handleMqChange);
-      window.removeEventListener('appinstalled', handleAppInstalled);
-    };
+      // Listen for the app being freshly installed in this session
+      const handleAppInstalled = () => setIsInstalled(true);
+      window.addEventListener('appinstalled', handleAppInstalled);
+
+      return () => {
+        mqStandalone.removeEventListener('change', handleMqChange);
+        window.removeEventListener('appinstalled', handleAppInstalled);
+      };
+    } catch (e) {
+      // Silently fail — install button will just stay visible
+    }
   }, []);
 
   const handleLogoutClick = () => {
