@@ -30,27 +30,29 @@ const Navbar: React.FC = () => {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   
-  // Track if PWA is installed or running in standalone app mode
-  const [isInstalled, setIsInstalled] = useState(false);
+  // Track if PWA is installed: ONLY true when running as a standalone app, not just in a browser
+  const [isInstalled, setIsInstalled] = useState(() => {
+    // Running as installed PWA (not in a regular browser tab)
+    return window.matchMedia('(display-mode: standalone)').matches ||
+      (navigator as any).standalone === true;
+  });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Check if already in standalone mode
-    const checkStandalone = () => {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
-      setIsInstalled(isStandalone);
-    };
-    checkStandalone();
+    // Listen for display-mode changes (e.g. user installs and reopens as app)
+    const mqStandalone = window.matchMedia('(display-mode: standalone)');
+    const handleMqChange = (e: MediaQueryListEvent) => setIsInstalled(e.matches);
+    mqStandalone.addEventListener('change', handleMqChange);
 
-    // Listen for the app being installed
-    const handleAppInstalled = () => {
-      console.log('App was installed!');
-      setIsInstalled(true);
-    };
-
+    // Listen for the app being freshly installed in this session
+    const handleAppInstalled = () => setIsInstalled(true);
     window.addEventListener('appinstalled', handleAppInstalled);
-    return () => window.removeEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      mqStandalone.removeEventListener('change', handleMqChange);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
   }, []);
 
   const handleLogoutClick = () => {
@@ -89,19 +91,26 @@ const Navbar: React.FC = () => {
   }, [location.pathname]);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      alert("The app is already installed, or your browser requires you to install it manually via the menu (e.g. 'Add to Home Screen').");
+    if (deferredPrompt) {
+      // Native install prompt is available — use it!
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setInstallPrompt(null);
+      }
       return;
     }
-    // Show the install prompt
-    deferredPrompt.prompt();
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
-      setInstallPrompt(null);
+
+    // No native prompt available — guide the user to install manually
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isSamsung = /SamsungBrowser/i.test(navigator.userAgent);
+
+    if (isIOS) {
+      alert('📱 To install on iPhone/iPad:\n\n1. Tap the Share button (the box with an arrow) at the bottom\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" to confirm!');
+    } else if (isSamsung) {
+      alert('📱 To install on Samsung:\n\n1. Tap the 3-dot menu (⋮) at the top right\n2. Tap "Add page to"\n3. Select "Home screen" and confirm!');
     } else {
-      console.log('User dismissed the install prompt');
+      alert('📱 To install:\n\n1. Tap the 3-dot menu (⋮) in your browser\n2. Look for "Add to Home Screen" or "Install App"\n3. Tap it and confirm!\n\nNote: Make sure you are on the live website (not localhost).');
     }
   };
 
