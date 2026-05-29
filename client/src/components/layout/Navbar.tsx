@@ -24,7 +24,7 @@ const LOFI_MUSIC_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const { musicEnabled, toggleMusic, isGameMusicPlaying, deferredPrompt, isInstallable, setInstallPrompt } = useGameStore();
+  const { musicEnabled, toggleMusic, isGameMusicPlaying, deferredPrompt, setInstallPrompt } = useGameStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);

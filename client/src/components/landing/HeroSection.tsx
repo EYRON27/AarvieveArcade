@@ -6,7 +6,7 @@ import { useGameStore } from '../../store/gameStore';
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
-  const { deferredPrompt, isInstallable, setInstallPrompt } = useGameStore();
+  const { deferredPrompt, setInstallPrompt } = useGameStore();
 
   const handleInstall = async () => {
     if (!deferredPrompt) {
