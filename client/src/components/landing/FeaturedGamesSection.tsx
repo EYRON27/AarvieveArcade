@@ -2,9 +2,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { useGameStore } from '../../store/gameStore';
 
 const FeaturedGamesSection: React.FC = () => {
-  const navigate = useNavigate();
+  const { openAuthModal } = useGameStore();
 
   const featuredGames = [
     { title: 'Space Dodger', icon: '🚀', color: 'from-blue-500 to-cyan-500', desc: 'Survive the asteroid field' },
@@ -44,7 +45,7 @@ const FeaturedGamesSection: React.FC = () => {
 
         <div className="mt-12 text-center">
            <button
-            onClick={() => navigate('/register')}
+            onClick={() => openAuthModal('register')}
             className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-6 py-3 text-sm font-bold tracking-widest uppercase transition-all"
           >
             <span>+ 8 More Games Inside</span>

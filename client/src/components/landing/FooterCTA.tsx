@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useGameStore } from '../../store/gameStore';
 
 const FooterCTA: React.FC = () => {
-  const navigate = useNavigate();
+  const { openAuthModal } = useGameStore();
 
   return (
     <>
@@ -18,7 +19,7 @@ const FooterCTA: React.FC = () => {
             <h2 className="font-display font-bold text-5xl md:text-7xl mb-6">Ready to Play?</h2>
             <p className="text-slate-400 text-xl mb-10">Create a free account and start climbing the leaderboards today.</p>
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => openAuthModal('register')}
               className="bg-arcade-red hover:bg-red-500 text-white font-black rounded-2xl px-12 py-5 text-lg tracking-widest uppercase transition-all shadow-[0_0_40px_rgba(239,68,68,0.4)] hover:shadow-[0_0_60px_rgba(239,68,68,0.6)] hover:-translate-y-1"
             >
               Create Account

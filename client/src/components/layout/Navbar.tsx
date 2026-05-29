@@ -24,7 +24,7 @@ const LOFI_MUSIC_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const { musicEnabled, toggleMusic, isGameMusicPlaying, deferredPrompt, setInstallPrompt } = useGameStore();
+  const { musicEnabled, toggleMusic, isGameMusicPlaying, deferredPrompt, setInstallPrompt, openAuthModal } = useGameStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -234,12 +234,12 @@ const Navbar: React.FC = () => {
             </>
           ) : (
             <>
-              <Link to="/login" className="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition-colors">
+              <button onClick={() => openAuthModal('login')} className="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition-colors">
                 Log In
-              </Link>
-              <Link to="/register" className="px-4 py-2 text-sm font-bold bg-arcade-red hover:bg-red-500 text-white rounded-lg transition-colors">
+              </button>
+              <button onClick={() => openAuthModal('register')} className="px-4 py-2 text-sm font-bold bg-arcade-red hover:bg-red-500 text-white rounded-lg transition-colors">
                 Sign Up
-              </Link>
+              </button>
             </>
           )}
         </div>
@@ -341,12 +341,12 @@ const Navbar: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="w-full text-center px-4 py-3 text-sm font-bold text-slate-300 hover:text-white border border-white/10 rounded-xl transition-colors">
+                    <button onClick={() => { setMobileMenuOpen(false); openAuthModal('login'); }} className="w-full text-center px-4 py-3 text-sm font-bold text-slate-300 hover:text-white border border-white/10 rounded-xl transition-colors">
                       Log In
-                    </Link>
-                    <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="w-full text-center px-4 py-3 text-sm font-bold bg-arcade-red hover:bg-red-500 text-white rounded-xl transition-colors">
+                    </button>
+                    <button onClick={() => { setMobileMenuOpen(false); openAuthModal('register'); }} className="w-full text-center px-4 py-3 text-sm font-bold bg-arcade-red hover:bg-red-500 text-white rounded-xl transition-colors">
                       Sign Up
-                    </Link>
+                    </button>
                   </>
                 )}
               </div>
