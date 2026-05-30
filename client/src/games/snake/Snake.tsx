@@ -47,12 +47,19 @@ const SnakeGame: React.FC<SnakeProps> = ({ onComplete, onStart, isPaused = false
     physicsRef.current.food = newFood!;
   };
 
+  const changeDirection = (dir: string) => {
+    const current = physicsRef.current.direction;
+    if (dir === 'UP' && current !== 'DOWN') physicsRef.current.nextDirection = 'UP';
+    else if (dir === 'DOWN' && current !== 'UP') physicsRef.current.nextDirection = 'DOWN';
+    else if (dir === 'LEFT' && current !== 'RIGHT') physicsRef.current.nextDirection = 'LEFT';
+    else if (dir === 'RIGHT' && current !== 'LEFT') physicsRef.current.nextDirection = 'RIGHT';
+  };
+
   const handleKeyPress = (e: KeyboardEvent) => {
-    const dir = physicsRef.current.direction;
-    if (e.code === 'ArrowUp' && dir !== 'DOWN') physicsRef.current.nextDirection = 'UP';
-    else if (e.code === 'ArrowDown' && dir !== 'UP') physicsRef.current.nextDirection = 'DOWN';
-    else if (e.code === 'ArrowLeft' && dir !== 'RIGHT') physicsRef.current.nextDirection = 'LEFT';
-    else if (e.code === 'ArrowRight' && dir !== 'LEFT') physicsRef.current.nextDirection = 'RIGHT';
+    if (e.code === 'ArrowUp') { e.preventDefault(); changeDirection('UP'); }
+    else if (e.code === 'ArrowDown') { e.preventDefault(); changeDirection('DOWN'); }
+    else if (e.code === 'ArrowLeft') { e.preventDefault(); changeDirection('LEFT'); }
+    else if (e.code === 'ArrowRight') { e.preventDefault(); changeDirection('RIGHT'); }
   };
 
   useEffect(() => {
@@ -83,15 +90,12 @@ const SnakeGame: React.FC<SnakeProps> = ({ onComplete, onStart, isPaused = false
     const absDy = Math.abs(dy);
 
     if (Math.max(absDx, absDy) > 30) {
-      const dir = physicsRef.current.direction;
       if (absDx > absDy) {
-        // Horizontal
-        if (dx > 0 && dir !== 'LEFT') physicsRef.current.nextDirection = 'RIGHT';
-        else if (dx < 0 && dir !== 'RIGHT') physicsRef.current.nextDirection = 'LEFT';
+        if (dx > 0) changeDirection('RIGHT');
+        else changeDirection('LEFT');
       } else {
-        // Vertical
-        if (dy > 0 && dir !== 'UP') physicsRef.current.nextDirection = 'DOWN';
-        else if (dy < 0 && dir !== 'DOWN') physicsRef.current.nextDirection = 'UP';
+        if (dy > 0) changeDirection('DOWN');
+        else changeDirection('UP');
       }
     }
     touchStartRef.current = null;
@@ -281,17 +285,27 @@ const SnakeGame: React.FC<SnakeProps> = ({ onComplete, onStart, isPaused = false
   return (
     <div 
       ref={containerRef} 
-      className="w-full flex flex-col items-center select-none"
+      className="w-full flex flex-col items-center select-none py-4"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      {/* HUD Header — outside canvas so it never overlaps */}
+      <div className="w-full max-w-sm flex justify-between items-center mb-4 px-4">
+        <div className="flex flex-col">
+          <h2 className="pixel-text text-arcade-green neon-text-green tracking-widest text-sm uppercase mb-1">
+            SNAKE
+          </h2>
+          <span className="text-arcade-blue font-pixel text-[10px] tracking-widest">ARCADE</span>
+        </div>
+        <div className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-right">
+          <span className="text-[10px] text-slate-500 uppercase tracking-widest block mb-0.5">SCORE</span>
+          <span className="font-pixel text-xl text-white block leading-none">{score}</span>
+        </div>
+      </div>
+
+      {/* Canvas */}
       <div className="relative border-4 border-slate-800 rounded-3xl overflow-hidden bg-slate-950 shadow-inner">
         <canvas ref={canvasRef} className="block" />
-
-        {/* HUD overlay */}
-        <div className="absolute top-4 right-4 font-pixel tracking-widest text-slate-100 bg-slate-950/60 backdrop-blur-sm border border-slate-800 rounded-2xl px-3 py-1.5 text-right text-sm z-20">
-          Score: <span className="text-arcade-green">{score}</span>
-        </div>
 
         {/* Idle/Welcome screen */}
         {gameState === 'idle' && (
@@ -308,8 +322,8 @@ const SnakeGame: React.FC<SnakeProps> = ({ onComplete, onStart, isPaused = false
               <Play className="w-4 h-4 fill-white" />
               <span>START GAME</span>
             </button>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-6">
-              USE KEYBOARD ARROW KEYS TO CONTROL
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-6 text-center">
+              USE ARROWS, SWIPE, OR D-PAD BELOW
             </p>
           </div>
         )}
@@ -321,7 +335,7 @@ const SnakeGame: React.FC<SnakeProps> = ({ onComplete, onStart, isPaused = false
             <h3 className="font-pixel text-[11px] text-red-400 text-center uppercase tracking-widest mb-2">
               SNAKE COLLIDED
             </h3>
-            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">LENGTH SCORE: {score}</p>
+            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">FINAL SCORE: {score}</p>
             
             <button
               onClick={startGame}
@@ -333,9 +347,57 @@ const SnakeGame: React.FC<SnakeProps> = ({ onComplete, onStart, isPaused = false
           </div>
         )}
       </div>
+
+      {/* D-Pad Controls — visible on all devices */}
+      <div className="mt-5 flex flex-col items-center gap-1.5 w-full max-w-sm px-4">
+        {/* Up button */}
+        <button
+          className="w-16 h-14 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 active:scale-95 rounded-2xl border-b-4 border-slate-900 flex items-center justify-center touch-manipulation transition-all select-none cursor-pointer"
+          onPointerDown={() => changeDirection('UP')}
+        >
+          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 5l8 8H4z" />
+          </svg>
+        </button>
+
+        {/* Left / Right row */}
+        <div className="flex gap-1.5">
+          <button
+            className="w-16 h-14 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 active:scale-95 rounded-2xl border-b-4 border-slate-900 flex items-center justify-center touch-manipulation transition-all select-none cursor-pointer"
+            onPointerDown={() => changeDirection('LEFT')}
+          >
+            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M5 12l8-8v16z" />
+            </svg>
+          </button>
+
+          {/* Center dead zone */}
+          <div className="w-14 h-14 rounded-2xl bg-slate-900/50 flex items-center justify-center">
+            <span className="text-slate-700 text-xl">🐍</span>
+          </div>
+
+          <button
+            className="w-16 h-14 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 active:scale-95 rounded-2xl border-b-4 border-slate-900 flex items-center justify-center touch-manipulation transition-all select-none cursor-pointer"
+            onPointerDown={() => changeDirection('RIGHT')}
+          >
+            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 12l-8 8V4z" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Down button */}
+        <button
+          className="w-16 h-14 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 active:scale-95 rounded-2xl border-b-4 border-slate-900 flex items-center justify-center touch-manipulation transition-all select-none cursor-pointer"
+          onPointerDown={() => changeDirection('DOWN')}
+        >
+          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 19l-8-8h16z" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 };
 
 export default SnakeGame;
-
