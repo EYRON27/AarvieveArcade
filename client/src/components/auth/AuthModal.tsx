@@ -114,14 +114,15 @@ const AuthModal: React.FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm"
+        style={{ height: '100dvh' }}
       >
         <motion.div
           initial={{ scale: 0.9, y: 20, opacity: 0 }}
           animate={{ scale: 1, y: 0, opacity: 1 }}
           exit={{ scale: 0.9, y: 20, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className={`relative w-full max-w-4xl bg-arcade-dark border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col min-h-[500px] ${isLogin ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+          className={`relative w-full max-w-4xl bg-arcade-dark border border-white/10 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col sm:min-h-[500px] max-h-[90dvh] sm:max-h-[85vh] ${isLogin ? 'md:flex-row' : 'md:flex-row-reverse'}`}
         >
           {/* Close Button */}
           <button
@@ -141,7 +142,7 @@ const AuthModal: React.FC = () => {
               <motion.div 
                 layout 
                 transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-                className="w-full md:w-1/2 flex flex-col bg-arcade-darker p-8 md:p-12 justify-center z-10"
+                className="w-full md:w-1/2 flex flex-col bg-arcade-darker p-6 sm:p-8 md:p-12 justify-center z-10 overflow-y-auto"
               >
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-white mb-2 font-display tracking-wide">
@@ -183,6 +184,7 @@ const AuthModal: React.FC = () => {
                           <input
                             type="text" placeholder="Name" value={displayName}
                             onChange={e => setDisplayName(e.target.value)} disabled={loading}
+                            onFocus={e => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)}
                             className="w-full bg-arcade-dark border border-white/10 hover:border-white/20 focus:border-arcade-blue/50 focus:outline-none rounded-xl py-3.5 pl-11 pr-4 text-slate-200 transition-all placeholder:text-slate-500"
                           />
                         </div>
@@ -196,6 +198,7 @@ const AuthModal: React.FC = () => {
                       <input
                         type="email" placeholder="Email" value={email}
                         onChange={e => setEmail(e.target.value)} disabled={loading}
+                        onFocus={e => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)}
                         className="w-full bg-arcade-dark border border-white/10 hover:border-white/20 focus:border-arcade-red/50 focus:outline-none rounded-xl py-3.5 pl-11 pr-4 text-slate-200 transition-all placeholder:text-slate-500"
                       />
                     </div>
@@ -207,6 +210,7 @@ const AuthModal: React.FC = () => {
                       <input
                         type={showPassword ? "text" : "password"} placeholder="Password" value={password}
                         onChange={e => setPassword(e.target.value)} disabled={loading}
+                        onFocus={e => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)}
                         className="w-full bg-arcade-dark border border-white/10 hover:border-white/20 focus:border-arcade-red/50 focus:outline-none rounded-xl py-3.5 pl-11 pr-11 text-slate-200 transition-all placeholder:text-slate-500"
                       />
                       <button
@@ -234,6 +238,7 @@ const AuthModal: React.FC = () => {
                           <input
                             type={showPassword ? "text" : "password"} placeholder="Confirm Password" value={confirmPassword}
                             onChange={e => setConfirmPassword(e.target.value)} disabled={loading}
+                            onFocus={e => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)}
                             className="w-full bg-arcade-dark border border-white/10 hover:border-white/20 focus:border-arcade-blue/50 focus:outline-none rounded-xl py-3.5 pl-11 pr-11 text-slate-200 transition-all placeholder:text-slate-500"
                           />
                         </div>
