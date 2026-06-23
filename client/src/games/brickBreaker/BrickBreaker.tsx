@@ -222,9 +222,10 @@ const BrickBreaker: React.FC<BrickBreakerProps> = ({ onComplete, onStart, isPaus
 
         // Win condition (Level Complete)
         if (activeBricks === 0) {
-          setGameState('level-complete');
           state.score += state.level * 500; // bonus for clearing board
           setScore(state.score);
+          setGameState('level-complete');
+          return; // stop this frame immediately so ball doesn't keep moving
         }
       }
 

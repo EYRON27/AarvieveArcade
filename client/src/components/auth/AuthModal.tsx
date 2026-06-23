@@ -6,7 +6,7 @@ import { Mail, Lock, Eye, EyeOff, User as UserIcon, X } from 'lucide-react';
 import LoadingScreen from '../ui/LoadingScreen';
 
 const AuthModal: React.FC = () => {
-  const { login, register } = useAuth();
+  const { login, register, resetPassword } = useAuth();
   const { isAuthModalOpen, authModalView, closeAuthModal, openAuthModal } = useGameStore();
   
   const isLogin = authModalView === 'login';
@@ -101,6 +101,29 @@ const AuthModal: React.FC = () => {
         setError(errorMessage);
         setLoading(false);
       }
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Please enter your email address to reset your password.');
+      return;
+    }
+    try {
+      setLoading(true);
+      await resetPassword(email);
+      setError('Password reset link sent to your email!');
+    } catch (err: unknown) {
+      const firebaseErr = err as { code?: string; message?: string };
+      let errorMessage = 'Failed to send password reset email.';
+      if (firebaseErr.code === 'auth/user-not-found') {
+        errorMessage = 'No user found with this email address.';
+      } else if (firebaseErr.code === 'auth/invalid-email') {
+        errorMessage = 'Please enter a valid email address.';
+      }
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -248,7 +271,12 @@ const AuthModal: React.FC = () => {
 
                   {isLogin && (
                     <div className="flex justify-center mt-2">
-                      <button type="button" className="text-sm font-semibold text-slate-400 hover:text-white transition-colors border-b border-transparent hover:border-white pb-0.5">
+                      <button 
+                        type="button" 
+                        onClick={handleForgotPassword}
+                        disabled={loading}
+                        className="text-sm font-semibold text-slate-400 hover:text-white transition-colors border-b border-transparent hover:border-white pb-0.5 cursor-pointer active:scale-95"
+                      >
                         Forgot your password?
                       </button>
                     </div>

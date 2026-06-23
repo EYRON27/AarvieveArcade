@@ -6,7 +6,8 @@ import {
   signOut, 
   onAuthStateChanged,
   browserLocalPersistence,
-  setPersistence
+  setPersistence,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { auth, db, isMockFirebase } from '../services/firebase';
@@ -20,6 +21,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, displayName?: string) => Promise<void>;
   logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
 }
 
@@ -198,6 +200,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  const resetPassword = async (email: string) => {
+    if (isMockFirebase) {
+      return; // Mock reset password doesn't do much
+    }
+    await sendPasswordResetEmail(auth, email);
+  };
+
   const updateProfile = async (data: Partial<UserProfile>) => {
     if (!user) return;
     
@@ -218,7 +227,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, resetPassword, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
