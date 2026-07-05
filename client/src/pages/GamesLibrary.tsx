@@ -29,6 +29,7 @@ const GAMES_LIST: GameItem[] = [
   { id: 'catchMyHeart',       title: 'Catch My Heart',      icon: '🧺', category: 'retro', difficulty: 'Easy',   approxTime: '2 min',    tag: 'FUN',     accentColor: 'border-arcade-blue/30  hover:border-arcade-blue  text-arcade-blue'  },
   { id: 'relationshipTrivia', title: 'Arcade Trivia',       icon: '🎯', category: 'cozy',  difficulty: 'Medium', approxTime: '2 min',    tag: 'TRIVIA',  accentColor: 'border-arcade-red/30  hover:border-arcade-red  text-arcade-red'   },
   { id: 'cupShuffle',         title: 'Cup Shuffle',         icon: '🥤', category: 'retro', difficulty: 'Medium', approxTime: '2 min',    tag: 'SKILL',   accentColor: 'border-arcade-blue/30  hover:border-arcade-blue  text-arcade-blue'  },
+  { id: 'dinoRun',            title: 'Dino Run',            icon: '🦕', category: 'retro', difficulty: 'Hard',   approxTime: '2 min',    tag: 'ACTION',  accentColor: 'border-arcade-green/30 hover:border-arcade-green text-arcade-green' },
 ];
 
 const DIFF_COLORS: Record<string, string> = {
