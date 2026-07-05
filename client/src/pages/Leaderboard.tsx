@@ -19,6 +19,7 @@ const GAME_LABELS: Record<string, { label: string; icon: string }> = {
   catchMyHeart:       { label: 'Catch My Heart',    icon: '🧺' },
   relationshipTrivia: { label: 'Arcade Trivia',     icon: '🎯' },
   cupShuffle:         { label: 'Cup Shuffle',       icon: '🥤' },
+  dinoRun:            { label: 'Dino Run',          icon: '🦕' },
 };
 
 const Leaderboard: React.FC = () => {

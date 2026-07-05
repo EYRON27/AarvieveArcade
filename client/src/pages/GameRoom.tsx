@@ -26,6 +26,7 @@ const ReactionGame = lazy(() => import('../games/reactionGame/ReactionGame'));
 const CatchMyHeart = lazy(() => import('../games/catchMyHeart/CatchMyHeart'));
 const RelationshipTrivia = lazy(() => import('../games/coupleGames/RelationshipTrivia'));
 const CupShuffle = lazy(() => import('../games/cupShuffle/CupShuffle'));
+const DinoRun = lazy(() => import('../games/dinoRun/DinoRun'));
 
 const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }> = {
   flappyBird: { title: 'Flappy Bird', desc: 'Navigate through obstacles without crashing.', icon: '🦅' },
@@ -41,7 +42,8 @@ const GAME_METRICS: Record<string, { title: string; desc: string; icon: string }
   reactionGame: { title: 'Reaction Clicker', desc: 'Click the target instantly — test your reflex.', icon: '⚡' },
   catchMyHeart: { title: 'Catch My Heart', desc: 'Catch falling hearts with your basket.', icon: '🧺' },
   relationshipTrivia: { title: 'Arcade Trivia', desc: 'Test your gaming knowledge — 5 questions.', icon: '🎯' },
-  cupShuffle: { title: 'Cup Shuffle', desc: 'Follow the shuffle and find where Pou is hiding!', icon: '🥤' }
+  cupShuffle: { title: 'Cup Shuffle', desc: 'Follow the shuffle and find where Pou is hiding!', icon: '🥤' },
+  dinoRun: { title: 'Dino Run', desc: 'Jump over cactus in this endless runner.', icon: '🦕' }
 };
 
 const GameRoom: React.FC = () => {
@@ -266,6 +268,7 @@ const GameRoom: React.FC = () => {
       case 'catchMyHeart': return <CatchMyHeart onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
       case 'relationshipTrivia': return <RelationshipTrivia onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
       case 'cupShuffle': return <CupShuffle onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
+      case 'dinoRun': return <DinoRun onComplete={handleGameComplete} onStart={handleGameStart} isPaused={isPaused} />;
       default: return <div>Game under maintenance</div>;
     }
   };
