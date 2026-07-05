@@ -14,7 +14,7 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
   const [board, setBoard] = useState<BoardState>(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [winner, setWinner] = useState<'💖' | '⭐' | 'TIE' | null>(null);
-  const [gameState, setGameState] = useState<'idle' | 'playing' | 'level-complete' | 'gameover'>('idle');
+  const [gameState, setGameState] = useState<'idle' | 'playing' | 'level-complete' | 'tie-game' | 'gameover'>('idle');
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
 
@@ -134,6 +134,8 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
     if (result === '💖') {
       setScore(s => s + (level * 100));
       setGameState('level-complete');
+    } else if (result === 'TIE') {
+      setGameState('tie-game');
     } else {
       setGameState('gameover');
       onComplete(score);
@@ -228,12 +230,35 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onComplete, onStart, isPaused = f
             </div>
           )}
 
+          {/* Tie Game Overlay */}
+          {gameState === 'tie-game' && (
+            <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-30 rounded-3xl">
+              <span className="text-5xl mb-2">🎀</span>
+              <h3 className="font-pixel text-[11px] text-slate-400 text-center uppercase tracking-widest mb-2">
+                TIE GAME!
+              </h3>
+              <p className="text-slate-300 font-bold text-xs uppercase tracking-widest mb-6">Current Score: {score}</p>
+              <button
+                onClick={() => {
+                  setBoard(Array(9).fill(null));
+                  setIsPlayerTurn(true);
+                  setWinner(null);
+                  setGameState('playing');
+                }}
+                className="flex items-center gap-1.5 mt-2 bg-slate-900 hover:bg-white hover:text-black text-white border-2 border-slate-800 rounded-2xl px-6 py-3.5 font-bold text-xs tracking-wider uppercase transition-all shadow-lg select-none cursor-pointer"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>RETRY LEVEL</span>
+              </button>
+            </div>
+          )}
+
           {/* Reset button if gameover */}
           {gameState === 'gameover' && (
             <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-30 rounded-3xl">
-              <span className="text-5xl mb-2">{winner === 'TIE' ? '🎀' : '💔'}</span>
+              <span className="text-5xl mb-2">💔</span>
               <h3 className="font-pixel text-[11px] text-slate-400 text-center uppercase tracking-widest mb-2">
-                {winner === 'TIE' ? 'TIE GAME!' : 'AI DEFEATED YOU!'}
+                AI DEFEATED YOU!
               </h3>
               <p className="text-slate-300 font-bold text-xs uppercase tracking-widest mb-6">Final Score: {score}</p>
               <button
