@@ -205,7 +205,7 @@ const AuthModal: React.FC = () => {
                         <div className="relative">
                           <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                           <input
-                            type="text" placeholder="Name" value={displayName}
+                            type="text" placeholder="Username" value={displayName}
                             onChange={e => setDisplayName(e.target.value)} disabled={loading}
                             onFocus={e => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)}
                             className="w-full bg-arcade-dark border border-white/10 hover:border-white/20 focus:border-arcade-blue/50 focus:outline-none rounded-xl py-3.5 pl-11 pr-4 text-slate-200 transition-all placeholder:text-slate-500"
