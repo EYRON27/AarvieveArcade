@@ -31,7 +31,7 @@ const DinoRun: React.FC<DinoRunProps> = ({ onComplete, onStart, isPaused = false
     lastObstacleFrame: 0,
   });
 
-  const requestRef = useRef<number>();
+  const requestRef = useRef<number>(0);
 
   // ── Sync state to refs ──
   useEffect(() => {
