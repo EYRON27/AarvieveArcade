@@ -158,14 +158,13 @@ const Sudoku: React.FC<SudokuProps> = ({ onComplete, onStart, isPaused = false }
     const { r, c } = selectedCell;
     if (board[r][c].isInitial) return;
 
-    setBoard(prev => {
-      const newBoard = prev.map(row => [...row]);
-      newBoard[r][c] = { ...newBoard[r][c], value: num };
-      return newBoard;
-    });
+    const newBoard = board.map(row => [...row]);
+    newBoard[r][c] = { ...newBoard[r][c], value: num };
+    
+    setBoard(newBoard);
 
-    // Check win condition slightly after state updates
-    setTimeout(() => checkWin(board), 0);
+    // Check win condition using the newly updated board
+    checkWin(newBoard);
   }, [gameState, selectedCell, board, isPaused, checkWin]);
 
   // Keyboard controls
